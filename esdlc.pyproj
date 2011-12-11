@@ -36,12 +36,6 @@
     <Compile Include="esdlc\emitters\cppamp\termination_template.py" />
     <Compile Include="esdlc\emitters\cppamp\yield_template.py" />
     <Compile Include="esdlc\emitters\cppamp\__init__.py" />
-    <Compile Include="esdlc\emitters\cpp\operators\binary_tournament.py" />
-    <Compile Include="esdlc\emitters\cpp\operators\rand.py" />
-    <Compile Include="esdlc\emitters\cpp\operators\random_binary.py" />
-    <Compile Include="esdlc\emitters\cpp\operators\_binary_individual.py" />
-    <Compile Include="esdlc\emitters\cpp\operators\__init__.py" />
-    <Compile Include="esdlc\emitters\cpp\__init__.py" />
     <Compile Include="esdlc\emitters\esec.py" />
     <Compile Include="esdlc\emitters\__init__.py" />
     <Compile Include="esdlc\model\astparser.py" />
@@ -70,8 +64,6 @@
     <Compile Include="esdlc\__init__.py" />
     <Compile Include="esdlc\errors.py" />
     <Folder Include="esdlc\emitters" />
-    <Folder Include="esdlc\emitters\cpp" />
-    <Folder Include="esdlc\emitters\cpp\operators" />
     <Folder Include="esdlc\model" />
     <Folder Include="esdlc\ast" />
     <Folder Include="esdlc\model\components" />
@@ -79,8 +71,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="esdlc\emitters\cppamp" />
-    <Content Include="esdlc\emitters\cpp\main.cpp" />
-    <Content Include="esdlc\emitters\cpp\operators\definitions.h" />
     <Content Include="test.esdl" />
     <Content Include="test_de.esdl" />
     <Content Include="test_ep.esdl" />
