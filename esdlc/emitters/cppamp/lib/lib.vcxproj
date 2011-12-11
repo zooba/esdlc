@@ -93,12 +93,12 @@
     <ClInclude Include="operators\mutate_delta.h" />
     <ClInclude Include="operators\mutate_gaussian.h" />
     <ClInclude Include="operators\mutate_random.h" />
-    <ClInclude Include="operators\repeated.h" />
     <ClInclude Include="operators\unique.h" />
     <ClInclude Include="output.h" />
     <ClInclude Include="rng.h" />
     <ClInclude Include="selectors\best.h" />
     <ClInclude Include="selectors\fitness_sus.h" />
+    <ClInclude Include="selectors\repeated.h" />
     <ClInclude Include="selectors\uniform_random.h" />
     <ClInclude Include="sort.h" />
     <ClInclude Include="statistics.h" />

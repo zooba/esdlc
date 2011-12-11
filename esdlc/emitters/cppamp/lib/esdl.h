@@ -74,8 +74,10 @@ using concurrency::parallel_for_each;
 
 #include "selectors\best.h"
 #include "selectors\uniform_random.h"
+#include "selectors\repeated.h"
 #include "selectors\fitness_sus.h"
 // ESDL operator: best()
 // ESDL operator: worst()
 // ESDL operator: uniform_random()
+// ESDL operator: repeated()
 // ESDL operator: fitness_sus(mu=(int)0)

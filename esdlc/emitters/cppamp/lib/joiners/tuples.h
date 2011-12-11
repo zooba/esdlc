@@ -5,7 +5,7 @@
 #include "..\utility.h"
 #include "..\individuals\joined_individuals.h"
 #include "..\operators\merge.h"
-#include "..\operators\repeated.h"
+#include "..\selectors\repeated.h"
 
 template<int Count, typename S1, typename S2, typename S3 = esdl::_nil>
 class tuples_t;

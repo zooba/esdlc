@@ -288,6 +288,12 @@ class EmitterScope(object):
                     else:
                         warn("Cannot use '%s' as templated bool parameter." % value)
                 elif p.cast == 'int' or p.cast == 'unsigned int':
+                    try:
+                        int(value)
+                    except (TypeError, ValueError):
+                        warn("Parameter '%s' requires a constant value. Using 10 instead." % p.name)
+                        self.global_scope.valid_constants[p.name] = 10
+                        value = 10
                     parts.append('std::integral_constant<%s, %d>()' % (p.cast, value))
                     parts.append(', ')
                 else:
@@ -648,7 +654,8 @@ def emit(model, out=sys.stdout, optimise_level=0, profile=False):
         if os.path.splitext(path)[1].lower() != '.exe':
             return
         exepath, path = path, os.path.splitext(path)[0] + '.cpp'
-        os.remove(path)
+        if os.path.exists(path):
+            os.remove(path)
         os.rename(exepath, path)
 
         here = os.path.split(__file__)[0]
