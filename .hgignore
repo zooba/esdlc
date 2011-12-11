@@ -1,0 +1,10 @@
+glob:*.pyc
+glob:*.pyo
+glob:*.docstates
+syntax: glob
+Debug\*
+*.sdf
+*.suo
+*.user
+Release\*
+*.vsp

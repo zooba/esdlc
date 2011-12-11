@@ -1,0 +1,98 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{A4A7614E-DBDD-4FF8-8ABF-3D2C6EAC2F3D}</ProjectGuid>
+    <ProjectHome>.</ProjectHome>
+    <StartupFile>esdlc.py</StartupFile>
+    <SearchPath>
+    </SearchPath>
+    <WorkingDirectory>.</WorkingDirectory>
+    <AssemblyName>esdlc</AssemblyName>
+    <Name>esdlc</Name>
+    <RootNamespace>esdlc</RootNamespace>
+    <IsWindowsApplication>False</IsWindowsApplication>
+    <InterpreterId>9a7a9026-48c1-4688-9d5d-e5699d47d074</InterpreterId>
+    <InterpreterVersion>2.7</InterpreterVersion>
+    <LaunchProvider>Standard Python launcher</LaunchProvider>
+    <CommandLineArguments>/e:cppamp /o:"D:\Users\Steve\Documents\PhD\Thesis\Other Documents\CEC\de_esdlc\de_esdlc.cpp" /P "D:\Users\Steve\Documents\PhD\Thesis\Other Documents\CEC\de_esdlc\de_esdlc.esdl"</CommandLineArguments>
+    <InterpreterPath />
+    <InterpreterArguments />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugSymbols>true</DebugSymbols>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugSymbols>true</DebugSymbols>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="esdlc.py" />
+    <Compile Include="esdlc\ast\validator.py" />
+    <Compile Include="esdlc\emitters\cppamp\built_in_template.py" />
+    <Compile Include="esdlc\emitters\cppamp\opening_template.py" />
+    <Compile Include="esdlc\emitters\cppamp\termination_template.py" />
+    <Compile Include="esdlc\emitters\cppamp\yield_template.py" />
+    <Compile Include="esdlc\emitters\cppamp\__init__.py" />
+    <Compile Include="esdlc\emitters\cpp\operators\binary_tournament.py" />
+    <Compile Include="esdlc\emitters\cpp\operators\rand.py" />
+    <Compile Include="esdlc\emitters\cpp\operators\random_binary.py" />
+    <Compile Include="esdlc\emitters\cpp\operators\_binary_individual.py" />
+    <Compile Include="esdlc\emitters\cpp\operators\__init__.py" />
+    <Compile Include="esdlc\emitters\cpp\__init__.py" />
+    <Compile Include="esdlc\emitters\esec.py" />
+    <Compile Include="esdlc\emitters\__init__.py" />
+    <Compile Include="esdlc\model\astparser.py" />
+    <Compile Include="esdlc\model\components\blocks.py" />
+    <Compile Include="esdlc\model\components\expressions.py" />
+    <Compile Include="esdlc\model\components\functions.py" />
+    <Compile Include="esdlc\model\components\lists.py" />
+    <Compile Include="esdlc\model\components\streams.py" />
+    <Compile Include="esdlc\model\components\variables.py" />
+    <Compile Include="esdlc\model\components\__init__.py" />
+    <Compile Include="esdlc\model\fluent.py" />
+    <Compile Include="esdlc\model\validator.py" />
+    <Compile Include="esdlc\model\__init__.py" />
+    <Compile Include="esdlc\ast\lexer.py" />
+    <Compile Include="esdlc\ast\nodes.py" />
+    <Compile Include="esdlc\ast\__init__.py" />
+    <Compile Include="run_tests.py" />
+    <Compile Include="tests\test_ast.py" />
+    <Compile Include="tests\test_emitters_esdl.py" />
+    <Compile Include="tests\test_lexer.py" />
+    <Compile Include="tests\test_model.py" />
+    <Compile Include="tests\test_model_ast.py" />
+    <Compile Include="tests\test_model_validator.py" />
+    <Compile Include="tests\__init__.py" />
+    <Folder Include="esdlc" />
+    <Compile Include="esdlc\__init__.py" />
+    <Compile Include="esdlc\errors.py" />
+    <Folder Include="esdlc\emitters" />
+    <Folder Include="esdlc\emitters\cpp" />
+    <Folder Include="esdlc\emitters\cpp\operators" />
+    <Folder Include="esdlc\model" />
+    <Folder Include="esdlc\ast" />
+    <Folder Include="esdlc\model\components" />
+    <Folder Include="tests" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="esdlc\emitters\cppamp" />
+    <Content Include="esdlc\emitters\cpp\main.cpp" />
+    <Content Include="esdlc\emitters\cpp\operators\definitions.h" />
+    <Content Include="test.esdl" />
+    <Content Include="test_de.esdl" />
+    <Content Include="test_ep.esdl" />
+    <Content Include="test_err.esdl" />
+    <Content Include="test_es.esdl" />
+    <Content Include="test_ga.esdl" />
+    <Content Include="test_m.esdl" />
+    <Content Include="test_memb.esdl" />
+    <Content Include="test_mjoin.esdl" />
+    <Content Include="test_nkc_ga.esdl" />
+    <Content Include="test_pso.esdl" />
+    <Content Include="test_pso_eo.esdl" />
+    <Content Include="test_ssga.esdl" />
+  </ItemGroup>
+</Project>
