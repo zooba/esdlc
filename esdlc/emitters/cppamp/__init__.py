@@ -655,14 +655,21 @@ def emit(model, out=sys.stdout, optimise_level=0, profile=False):
         if not os.path.exists(here):
             return
 
-        cmd = ['cl', '/Ox', '/GF', '/GR-', '/GL', '/EHsc', '/MP',
-               '/I' + os.path.expandvars(r'%VSINSTALLDIR%Common7\IDE\Extensions\Microsoft\Concurrency Visualizer\SDK\Native\Inc'),
-               '/I' + os.path.join(here, 'lib'),
-               path,
-               os.path.join(here, 'lib', 'rng.cpp'),
-               os.path.join(here, 'lib', 'utility.cpp'),
-               '/link',
-               'advapi32.lib']
+        if profile:
+            cmd = ['cl', '/Ox', '/GF', '/GR-', '/GL', '/EHsc', '/MP',
+                   '/I' + os.path.expandvars(r'%VSINSTALLDIR%Common7\IDE\Extensions\Microsoft\Concurrency Visualizer\SDK\Native\Inc'),
+                   '/I' + os.path.join(here, 'lib'),
+                   path,
+                   os.path.join(here, 'lib', 'rng.cpp'),
+                   os.path.join(here, 'lib', 'utility.cpp'),
+                   '/link',
+                   'advapi32.lib']
+        else:
+            cmd = ['cl', '/Ox', '/GF', '/GR-', '/GL', '/EHsc', '/MP',
+                   '/I' + os.path.join(here, 'lib'),
+                   path,
+                   os.path.join(here, 'lib', 'rng.cpp'),
+                   os.path.join(here, 'lib', 'utility.cpp')]
         subprocess.call(cmd)
 
     return lines, { '__compile': _compile }
