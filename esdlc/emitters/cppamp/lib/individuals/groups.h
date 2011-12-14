@@ -9,34 +9,55 @@
 
 namespace esdl
 {
+    namespace tt
+    {
+        template<typename EvaluatorType>
+        struct evaluator_invoke {
+            template<typename GroupType> static void invoke(std::shared_ptr<EvaluatorType> ep, GroupType& group) {
+                (*ep)(group);
+            }
+        };
+
+        template<>
+        struct evaluator_invoke<void> {
+            template<typename GroupType> static void invoke(std::shared_ptr<void>, GroupType& group) { }
+        };
+    }
+
     template<typename IndividualType, typename EvaluatorType>
     class group
     {
         std::shared_ptr<concurrency::array<IndividualType, 1>> ptr;
     public:
+        std::shared_ptr<EvaluatorType> evalptr;
         bool evaluated;
 
-        typename std::enable_if<std::is_constructible<EvaluatorType>::value>::type
-        evaluate() {
-            EvaluatorType()(*this);
-            evaluated = true;
+        void evaluate() {
+            if (evalptr) {
+                tt::evaluator_invoke<EvaluatorType>::invoke(evalptr, *this);
+                evaluated = true;
+            }
         }
 
         template<typename NewEvaluatorType>
-        group<IndividualType, NewEvaluatorType> evaluate_using(NewEvaluatorType) {
-            return group<IndividualType, NewEvaluatorType>(ptr);
+        group<IndividualType, NewEvaluatorType> evaluate_using(std::shared_ptr<NewEvaluatorType> newEval) {
+            return group<IndividualType, NewEvaluatorType>(ptr, newEval);
         }
         
-        group() : ptr(nullptr), evaluated(false) { }
-        group(int size) : ptr(std::make_shared<concurrency::array<IndividualType, 1>>(size, esdl::acc)), evaluated(false) { }
-        group(std::shared_ptr<concurrency::array<IndividualType, 1>> p) : ptr(p), evaluated(false) { }
-        group(const concurrency::array<IndividualType, 1>& other) : ptr(std::make_shared<concurrency::array<IndividualType, 1>>(other, esdl::acc)), evaluated(false) { }
-        group(const std::list<IndividualType>& list)
-            : ptr(std::make_shared<concurrency::array<IndividualType, 1>>(list.size(), std::begin(list), std::end(list), esdl::acc)), evaluated(false) { }
-        group(const std::vector<IndividualType>& list)
-            : ptr(std::make_shared<concurrency::array<IndividualType, 1>>(list.size(), std::begin(list), std::end(list), esdl::acc)), evaluated(false) { }
-        group(nullptr_t) : ptr(nullptr), evaluated(false) { }
-
+        group() : ptr(nullptr), evalptr(nullptr), evaluated(false) { }
+        group(int size, std::shared_ptr<EvaluatorType> ep)
+            : ptr(std::make_shared<concurrency::array<IndividualType, 1>>(size, esdl::acc)), evalptr(ep), evaluated(false) { }
+        group(std::shared_ptr<concurrency::array<IndividualType, 1>> p, std::shared_ptr<EvaluatorType> ep)
+            : ptr(p), evalptr(ep), evaluated(false) { }
+        group(const concurrency::array<IndividualType, 1>& other, std::shared_ptr<EvaluatorType> ep)
+            : ptr(std::make_shared<concurrency::array<IndividualType, 1>>(other, esdl::acc)), evalptr(ep), evaluated(false) { }
+        group(const std::list<IndividualType>& list, std::shared_ptr<EvaluatorType> ep)
+            : ptr(std::make_shared<concurrency::array<IndividualType, 1>>((int)list.size(), std::begin(list), std::end(list), esdl::acc)), 
+            evalptr(ep), evaluated(false) { }
+        group(const std::vector<IndividualType>& list, std::shared_ptr<EvaluatorType> ep)
+            : ptr(std::make_shared<concurrency::array<IndividualType, 1>>((int)list.size(), std::begin(list), std::end(list), esdl::acc)),
+            evalptr(ep), evaluated(false) { }
+        
         operator bool() const { return (bool)ptr; }
         concurrency::array<IndividualType, 1>& operator*() { return *ptr; }
         const concurrency::array<IndividualType, 1>& operator*() const { return *ptr; }
@@ -69,26 +90,41 @@ namespace esdl
 
     template<typename IndividualType, typename EvaluatorType>
     group<IndividualType, EvaluatorType> make_group() {
-        return group<IndividualType, EvaluatorType>(nullptr);
+        return group<IndividualType, EvaluatorType>();
     }
 
     template<typename IndividualType, typename EvaluatorType>
     group<IndividualType, EvaluatorType> make_group(int size) {
-        return group<IndividualType, EvaluatorType>(size);
+        return group<IndividualType, EvaluatorType>(size, nullptr);
     }
 
     template<typename IndividualType, typename EvaluatorType>
-    group<IndividualType, EvaluatorType> make_group(const group<IndividualType, EvaluatorType>& other) {
-        return group<IndividualType, EvaluatorType>(*other);
+    group<IndividualType, EvaluatorType> make_group(int size, std::shared_ptr<EvaluatorType> ep) {
+        return group<IndividualType, EvaluatorType>(size, ep);
     }
 
     template<typename IndividualType, typename EvaluatorType>
+    group<IndividualType, EvaluatorType> make_group(group<IndividualType, EvaluatorType> other) {
+        return group<IndividualType, EvaluatorType>(*other, other.evalptr);
+    }
+
+    /*template<typename IndividualType, typename EvaluatorType>
     group<IndividualType, EvaluatorType> make_group(const std::vector<IndividualType>& other) {
-        return group<IndividualType, EvaluatorType>(other);
+        return group<IndividualType, EvaluatorType>(other, nullptr);
     }
     
     template<typename IndividualType, typename EvaluatorType>
     group<IndividualType, EvaluatorType> make_group(const std::list<IndividualType>& other) {
-        return group<IndividualType, EvaluatorType>(other);
+        return group<IndividualType, EvaluatorType>(other, nullptr);
+    }*/
+
+    template<typename IndividualType, typename EvaluatorType>
+    group<IndividualType, EvaluatorType> make_group(const std::vector<IndividualType>& other, std::shared_ptr<EvaluatorType> ep) {
+        return group<IndividualType, EvaluatorType>(other, ep);
+    }
+    
+    template<typename IndividualType, typename EvaluatorType>
+    group<IndividualType, EvaluatorType> make_group(const std::list<IndividualType>& other, std::shared_ptr<EvaluatorType> ep) {
+        return group<IndividualType, EvaluatorType>(other, ep);
     }
 }

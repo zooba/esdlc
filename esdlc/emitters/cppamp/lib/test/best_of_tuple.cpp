@@ -18,9 +18,9 @@ void test_best_of_tuple_2() {
     test_start(L"best_of_tuple on pairs");
 
     auto _s1 = random_real(std::integral_constant<int, 5>(), -1.0f, 1.0f)(10);
-    auto s1 = _s1.evaluate_using(TestEvaluator(_s1));
+    auto s1 = _s1.evaluate_using(std::make_shared<TestEvaluator>());
     auto _s2 = real_high(std::integral_constant<int, 5>(), -1.0f, 1.0f)(10);
-    auto s2 = _s2.evaluate_using(TestEvaluator(_s2));
+    auto s2 = _s2.evaluate_using(std::make_shared<TestEvaluator>());
     typedef esdl::tt::individual_type<decltype(s1)>::type Indiv;
 
     auto g1 = best_of_tuple(esdl::merge(tuples(esdl::merge(s1), esdl::merge(s2))()))();
@@ -37,11 +37,11 @@ void test_best_of_tuple_3() {
     test_start(L"best_of_tuple on triplets");
 
     auto _s1 = random_real(std::integral_constant<int, 5>(), -1.0f, 1.0f)(10);
-    auto s1 = _s1.evaluate_using(TestEvaluator(_s1));
+    auto s1 = _s1.evaluate_using(std::make_shared<TestEvaluator>());
     auto _s2 = real_high(std::integral_constant<int, 5>(), -1.0f, 1.0f)(10);
-    auto s2 = _s2.evaluate_using(TestEvaluator(_s2));
+    auto s2 = _s2.evaluate_using(std::make_shared<TestEvaluator>());
     auto _s3 = random_real(std::integral_constant<int, 5>(), -1.0f, 1.0f)(10);
-    auto s3 = _s1.evaluate_using(TestEvaluator(_s1));
+    auto s3 = _s1.evaluate_using(std::make_shared<TestEvaluator>());
     typedef esdl::tt::individual_type<decltype(s1)>::type Indiv;
 
     auto g1 = best_of_tuple(esdl::merge(tuples(esdl::merge(s1), esdl::merge(s2), esdl::merge(s3))()))();

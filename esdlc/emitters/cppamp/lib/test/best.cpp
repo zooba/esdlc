@@ -16,9 +16,9 @@ void test_best() {
     test_start(L"Best selection");
     
     auto _g1 = random_real(std::integral_constant<int, 10>(), 0.0, 10.0)(100);
-    auto g1 = _g1.evaluate_using(TestEvaluator(_g1));
+    auto g1 = _g1.evaluate_using(std::make_shared<TestEvaluator>());
     typedef esdl::tt::individual_type<decltype(g1)>::type Indiv;
-
+    
     auto g2 = best(esdl::merge(g1))();
     auto g2l = g2.as_vector();
 
@@ -53,7 +53,7 @@ void test_worst() {
     test_start(L"Worst selection");
     
     auto _g1 = random_real(std::integral_constant<int, 10>(), 0.0, 10.0)(100);
-    auto g1 = _g1.evaluate_using(TestEvaluator(_g1));
+    auto g1 = _g1.evaluate_using(std::make_shared<TestEvaluator>());
     typedef esdl::tt::individual_type<decltype(g1)>::type Indiv;
     auto g1l = g1.as_vector();
 

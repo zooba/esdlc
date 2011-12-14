@@ -14,11 +14,12 @@ namespace esdl
     class Merger_t {
         typedef typename tt::individual_type<GroupType>::type IndividualType;
         typedef typename tt::evaluator_type<GroupType>::type EvaluatorType;
-    public:
 
         GroupType groups[Count];
         int upToGroup, upToIndividual, availableCount;
+        std::shared_ptr<EvaluatorType> evalptr;
 
+    public:
         Merger_t() : upToGroup(0), upToIndividual(0), availableCount(0) { }
 
         Merger_t(GroupType group)
@@ -26,6 +27,7 @@ namespace esdl
         {
             static_assert(Count == 1, "Must provide array for Count != 1");
             groups[0] = group;
+            evalptr = group.evalptr;
         }
 
         Merger_t(GroupType (&group_array)[Count])
@@ -35,6 +37,7 @@ namespace esdl
                 groups[i] = group_array[i];
                 availableCount += group_array[i].size();
             }
+            evalptr = groups[0].evalptr;
         }
 
         GroupType operator()(int count)
@@ -43,7 +46,7 @@ namespace esdl
 
             if (count == 0) return make_group<IndividualType, EvaluatorType>();
 
-            auto pStream = make_group<IndividualType, EvaluatorType>(count);
+            auto pStream = make_group<IndividualType, EvaluatorType>(count, evalptr);
             auto& dest = *pStream;
 
             for (int i = 0; i < count; ) {

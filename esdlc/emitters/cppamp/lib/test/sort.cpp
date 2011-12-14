@@ -47,12 +47,12 @@ void test_sort_individuals() {
     test_start(L"Sort individuals");
     
     auto _g1 = random_real(std::integral_constant<int, 5>(), -1.0, 1.0)(10000);
-    auto g1 = _g1.evaluate_using(TestEvaluator(_g1));
+    auto g1 = _g1.evaluate_using(std::make_shared<TestEvaluator>());
     g1.evaluate();
     typedef esdl::tt::individual_type<decltype(g1)>::type Indiv;
     typedef esdl::tt::evaluator_type<decltype(g1)>::type Evaluator;
     
-    auto g2 = esdl::group<Indiv, Evaluator>(esdl_sort::parallel_sort(*g1));
+    auto g2 = esdl::group<Indiv, Evaluator>(esdl_sort::parallel_sort(*g1), g1.evalptr);
     auto g1l = g1.as_vector();
     auto g2l = g2.as_vector();
 

@@ -16,6 +16,7 @@ class fitness_sus_t
 
     typedef typename esdl_sort::key_index_type<typename esdl::tt::individual_type<SourceType>::type>::type KeyType;
     std::vector<KeyType> src_list;
+    std::shared_ptr<EvaluatorType> evalptr;
 
     float p, p_next, p_step;
     int p_i;
@@ -23,6 +24,7 @@ public:
 
     fitness_sus_t(SourceType source, int mu) : mu(mu), pSource(source()) {
         pSource.evaluate();
+        evalptr = pSource.evalptr;
         auto keys = esdl_sort::parallel_sort_keys(*pSource);
         src_list.reserve(keys->extent.size());
         concurrency::copy(*keys, std::back_inserter(src_list));
@@ -55,7 +57,7 @@ public:
 
         //concurrency::array_view<const int, 1> indices(index_list.size(), index_list);
         concurrency::array<int, 1> indices(index_list.size(), std::begin(index_list), std::end(index_list), esdl::acc);
-        auto pResult = esdl::make_group<IndividualType, EvaluatorType>(index_list.size());
+        auto pResult = esdl::make_group<IndividualType, EvaluatorType>(index_list.size(), evalptr);
         auto& src = *pSource;
         auto& result = *pResult;
         parallel_for_each(esdl::acc, result.grid, [&](index<1> i) restrict(direct3d) {

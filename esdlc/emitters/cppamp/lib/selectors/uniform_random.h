@@ -16,7 +16,7 @@ public:
 
     esdl::group<IndividualType, EvaluatorType> operator()(int count) {
         auto pSrc = source();
-        auto pResult = esdl::make_group<IndividualType, EvaluatorType>(count);
+        auto pResult = esdl::make_group<IndividualType, EvaluatorType>(count, pSrc.evalptr);
         
         auto& src = *pSrc;
         auto& dest = *pResult;

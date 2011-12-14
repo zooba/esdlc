@@ -26,11 +26,13 @@ public:
 
     esdl::group<IndividualType, EvaluatorType> operator()(int count) {
         bool evaluated = true;
+        std::shared_ptr<EvaluatorType> evaluator;
         std::list<IndividualType> indivs;
         std::set<IndividualType, indiv_less> seen;
 
         while (indivs.size() < (unsigned int)count) {
             auto src = source(count);
+            if (!evaluator) evaluator = src.evalptr;
             if (src.size() == 0) break;
             if (!src.evaluated) evaluated = false;
             auto src_list = src.as_list();
@@ -47,7 +49,7 @@ public:
             indivs.pop_back();
         }
 
-        auto result = esdl::make_group<IndividualType, EvaluatorType>(indivs);
+        auto result = esdl::make_group<IndividualType, EvaluatorType>(indivs, evaluator);
         result.evaluated = evaluated;
         return result;
     }
@@ -65,7 +67,7 @@ public:
             }
         }
 
-        auto result = esdl::make_group<IndividualType, EvaluatorType>(indivs);
+        auto result = esdl::make_group<IndividualType, EvaluatorType>(indivs, src.evalptr);
         result.evaluated = src.evaluated;
         return result;
     }

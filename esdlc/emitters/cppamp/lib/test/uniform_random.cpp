@@ -17,7 +17,7 @@ void test_uniform_random() {
     test_start(L"Uniform random selection");
     
     auto _g1 = random_real(std::integral_constant<int, 10>(), 0.0, 10.0)(100);
-    auto g1 = _g1.evaluate_using(TestEvaluator(_g1));
+    auto g1 = _g1.evaluate_using(std::make_shared<TestEvaluator>());
     typedef esdl::tt::individual_type<decltype(g1)>::type Indiv;
 
     g1 = best(esdl::merge(g1))();

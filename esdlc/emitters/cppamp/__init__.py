@@ -253,8 +253,12 @@ class EmitterScope(object):
             warn("Cannot convert %s to string: %s" % (expr.tag, expr))
             return ''
 
-    def _funcobj_to_string(self, func, params, leading_parameters=None):
-        parts = [func.name, '(']
+    def _funcobj_to_string(self, func, params, leading_parameters=None, sharedptr=False):
+        if sharedptr:
+            parts = ['std::make_shared<', func.name, '>(']
+        else:
+            parts = [func.name, '(']
+        
         if leading_parameters:
             for p in leading_parameters:
                 parts.append(self._expr_to_string(p))
@@ -370,6 +374,19 @@ class EmitterScope(object):
 
         return self._funcobj_to_string(func, op.func.parameter_dict, [source])
 
+    def _evaluator_to_string(self, evaluator):
+        name = self._expr_to_string(evaluator.parameter_dict['_function'])
+        name2 = name.replace('.', '::')
+        params = [i for i in evaluator.parameter_dict.iterkeys() if i != '_function']
+        
+        func = (self._find_function(name, params, self.known_evaluators) or 
+                self._find_function(name2, params, self.known_evaluators))
+
+        if not func:
+            return ''
+
+        return self._funcobj_to_string(func, evaluator.parameter_dict, sharedptr=True)
+
     def _generator_to_string(self, generator):
         name = self._expr_to_string(generator.parameter_dict['_function'])
         name2 = name.replace('.', '::')
@@ -477,10 +494,7 @@ class EmitterScope(object):
                 lines.append(line + ');')
 
                 part1, _, part2 = self.default_evaluator.partition('(')
-                if part2.strip() == ')':
-                    evaluator = '%s(%s)' % (part1, tempname1)
-                else:
-                    evaluator = '%s(%s, %s' % (part1, tempname1, part2)
+                evaluator = 'std::make_shared<%s>(%s' % (part1, part2)
 
                 groupname = self._expr_to_string(group.id)
                 if self.has(groupname, 'allocated_groups'):
@@ -514,13 +528,24 @@ class EmitterScope(object):
                     filename = stmt.text[8:]
                     self.include(filename)
                 elif stmt.text.startswith('evaluator '):
-                    self.default_evaluator = stmt.text[10:]
+                    evalname = stmt.text[10:].strip()
+                    if self.default_evaluator:
+                        warn("Cannot override existing default evaluator '%s' with '%s'." % 
+                             (self.default_evaluator, evalname))
+                    else:
+                        self.default_evaluator = evalname
                 elif stmt.text.startswith('selector '):
-                    self.selector = stmt.text[9:]
+                    selname = stmt.text[9:].strip()
+                    if self.selector:
+                        warn("Cannot override existing selector '%s' with '%s'." %
+                             (self.selector, selname))
+                    else:
+                        self.selector = selname
                 elif stmt.text.startswith('yield '):
                     groupname = stmt.text[6:].strip()
                     if self.default_group:
-                        warn("Cannot override existing default group.")
+                        warn("Cannot override existing default group '%s' with '%s'." %
+                             (self.default_group, groupname))
                     else:
                         self.default_group = groupname
                         self.default_group_yielded = False
@@ -551,15 +576,24 @@ class EmitterScope(object):
             elif stmt.tag == 'evalstmt':
                 evaluator = None
                 if stmt.evaluators:
-                    evaluator = stmt.evaluators[0]
-                    # TODO: Instantiate evaluator
+                    evaluator = self._evaluator_to_string(stmt.evaluators[0])
                     if len(stmt.evaluators) > 1:
                         warn("Multiple evaluators are not supported.")
 
                 for group in stmt.sources:
-                    groupname = self._expr_to_string(group)
+                    var = group if group.tag == 'variable' else group.id
+                    groupname = self.safe_variable(var.name)
+                    if groupname[-1] in '0123456789':
+                        for i in xrange(len(groupname)):
+                            if groupname[-i] not in '0123456789':
+                                groupname2 = groupname[:-(i-1)] + str(int(groupname[-(i-1):]) + 1)
+                                break
+                    else:
+                        groupname2 = groupname + '1'
+                    self.anonymous_variables[groupname] = groupname2
+                    lines.append('auto %s = %s.evaluate_using(%s);' % (groupname2, groupname, evaluator))
                     # TODO: Assign evaluator
-                    lines.append('%s.evaluated = false;' % groupname)
+                    #lines.append('%s.evaluated = false;' % groupname)
 
             elif stmt.tag == 'yieldstmt':
                 for group in stmt.sources:
@@ -619,7 +653,7 @@ def emit(model, out=sys.stdout, optimise_level=0, profile=False):
         else:
             warn('Default group not specified in initialisation. Statistics and fitness termination are not available.')
 
-    lines.extend(termination_template.get(global_scope.default_group))
+    lines.extend(termination_template.get(global_scope.safe_variable(global_scope.default_group)))
 
     block_i = 0
     for block_name in model.block_names:

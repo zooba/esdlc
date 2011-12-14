@@ -18,7 +18,7 @@ public:
             return pSource;
         }
 
-        auto pDest = esdl::make_group<IndividualType, EvaluatorType>(count);
+        auto pDest = esdl::make_group<IndividualType, EvaluatorType>(count, pSource.evalptr);
         
         auto& src = *pSource;
         auto& dest = *pDest;

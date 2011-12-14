@@ -11,7 +11,7 @@
 
 #include "operators\merge.h"
 
-#include "operators\repeated.h"
+#include "selectors\repeated.h"
 #include "operators\unique.h"
 
 void test_repeated() {

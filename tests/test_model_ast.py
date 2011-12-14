@@ -8,7 +8,7 @@ def check(input, output=None):
         print 'Errors:\n  ' + '\n  '.join(str(i) for i in ast.errors)
         print 'Warnings:\n  ' + '\n  '.join(str(i) for i in ast.warnings)
         assert False
-    model = AstSystem(ast)
+    model = AstSystem(ast=ast)
     validation = model.validate()
     if not validation:
         print ast.format()

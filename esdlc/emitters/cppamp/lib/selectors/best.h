@@ -12,7 +12,7 @@ esdl::Merger_t<typename esdl::tt::group_type<SourceType>::type, 1> best(SourceTy
 
     auto pSource = source();
     pSource.evaluate();
-    auto pResult = esdl::group<IndividualType, EvaluatorType>(esdl_sort::parallel_sort(*pSource, false));
+    auto pResult = esdl::group<IndividualType, EvaluatorType>(esdl_sort::parallel_sort(*pSource, false), pSource.evalptr);
     pResult.evaluated = true;
     return esdl::merge(pResult);
 }
@@ -24,7 +24,7 @@ esdl::Merger_t<typename esdl::tt::group_type<SourceType>::type, 1> worst(SourceT
 
     auto pSource = source();
     pSource.evaluate();
-    auto pResult = esdl::group<IndividualType, EvaluatorType>(esdl_sort::parallel_sort(*pSource, true));
+    auto pResult = esdl::group<IndividualType, EvaluatorType>(esdl_sort::parallel_sort(*pSource, true), pSource.evalptr);
     pResult.evaluated = true;
     return esdl::merge(pResult);
 }

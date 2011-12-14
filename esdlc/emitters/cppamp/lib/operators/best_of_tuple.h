@@ -22,7 +22,7 @@ public:
         src.group1.evaluate();
         src.group2.evaluate();
 
-        auto pResult = esdl::make_group<IndividualType, EvaluatorType>(src.size());
+        auto pResult = esdl::make_group<IndividualType, EvaluatorType>(src.size(), src.group1.evalptr);
         
         auto& src1 = *src.group1;
         auto& src2 = *src.group2;
@@ -41,7 +41,7 @@ public:
         src.group1.evaluate();
         src.group2.evaluate();
 
-        auto pResult = esdl::make_group<IndividualType, EvaluatorType>(src.size());
+        auto pResult = esdl::make_group<IndividualType, EvaluatorType>(src.size(), src.group1.evalptr);
         
         auto& src1 = *src.group1;
         auto& src2 = *src.group2;
@@ -75,7 +75,7 @@ public:
         src.group2.evaluate();
         src.group3.evaluate();
 
-        auto pResult = esdl::make_group<IndividualType, EvaluatorType>(src.size());
+        auto pResult = esdl::make_group<IndividualType, EvaluatorType>(src.size(), src.group1.evalptr);
         
         auto& src1 = *src.group1;
         auto& src2 = *src.group2;
@@ -102,7 +102,7 @@ public:
         src.group2.evaluate();
         src.group3.evaluate();
 
-        auto pResult = esdl::make_group<IndividualType, EvaluatorType>(src.size());
+        auto pResult = esdl::make_group<IndividualType, EvaluatorType>(src.size(), src.group1.evalptr);
         
         auto& src1 = *src.group1;
         auto& src2 = *src.group2;

@@ -76,10 +76,11 @@ inline void test_notimpl() {
     std::wcout << L"not implemented" << std::endl;
 }
 
-template<typename IndividualType>
-struct TestEvaluator_t {
-    TestEvaluator_t() { }
-    void operator()(esdl::group<IndividualType, TestEvaluator_t<IndividualType>> group) {
+struct TestEvaluator {
+    TestEvaluator() { }
+    
+    template<typename IndividualType>
+    void operator()(esdl::group<IndividualType, TestEvaluator> group) const {
         auto& g = *group;
         concurrency::parallel_for_each(g.grid, [&](index<1> i) restrict(direct3d) {
             g[i].fitness = 0;
@@ -89,10 +90,3 @@ struct TestEvaluator_t {
         });
     }
 };
-
-template<typename IndividualType>
-TestEvaluator_t<IndividualType> TestEvaluator() { return TestEvaluator_t<IndividualType>(); }
-template<typename IndividualType, typename EvaluatorType>
-TestEvaluator_t<IndividualType> TestEvaluator(esdl::group<IndividualType, EvaluatorType>) { return TestEvaluator_t<IndividualType>(); }
-
-

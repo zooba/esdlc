@@ -16,7 +16,7 @@ void test_single_fitness_sus() {
     test_start(L"Fitness-proportional Stochastic Uniform Sampling");
 
     auto _g1 = random_real(std::integral_constant<int, 10>(), 0.0, 10.0)(100);
-    auto g1 = _g1.evaluate_using(TestEvaluator(_g1));
+    auto g1 = _g1.evaluate_using(std::make_shared<TestEvaluator>());
     typedef esdl::tt::individual_type<decltype(g1)>::type Indiv;
 
     auto g1l = g1.as_vector();
@@ -36,7 +36,7 @@ void test_fitness_sus() {
     test_start(L"Fitness-proportional Stochastic Uniform Sampling (x100)");
     
     auto _g1 = random_real(std::integral_constant<int, 10>(), 0.0, 10.0)(100);
-    auto g1 = _g1.evaluate_using(TestEvaluator(_g1));
+    auto g1 = _g1.evaluate_using(std::make_shared<TestEvaluator>());
     typedef esdl::tt::individual_type<decltype(g1)>::type Indiv;
 
     auto g1l = g1.as_vector();

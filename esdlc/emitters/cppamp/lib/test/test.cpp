@@ -55,12 +55,12 @@ int wmain(int argc, wchar_t* argv[]) {
     esdl::seed(1);
 
     for (int i = 0; i < 2; ++i) {
-        //test_random();
-        //test_random_normal();
+        test_random();
+        test_random_normal();
 
         test_sort();
         
-        /*test_real_generators_fixed();
+        test_real_generators_fixed();
         test_int_generators_fixed();
 
         test_mutate_random_real();
@@ -88,7 +88,7 @@ int wmain(int argc, wchar_t* argv[]) {
         test_best_of_tuple_2();
         test_best_of_tuple_3();
 
-        test_fitness_sus();*/
+        test_fitness_sus();
     }
 
     CvReleaseMarkerSeries(_series);
