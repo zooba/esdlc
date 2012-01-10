@@ -16,9 +16,11 @@ def _any(strings):
     return re.compile('(' + '|'.join(_escape(s) for s in strings) + ')', re.IGNORECASE)
 
 TOKENS = [
-    #('comparison', _any(('<=', '=<', '<', '!=', '==', '>', '>=', '=>'))),
-    ('operator', _any('+-*/%^=,.')),
     ('comment', _re(r"(#|;|//).*")),
+    #('comparison', _any(('<=', '=<', '<', '!=', '==', '>', '>=', '=>'))),
+    ('operator', _any('+-*/%^.')),
+    ('assign', _re('\\=')),
+    ('comma', _re('\\,')),
     ('name', _re(r"(?!\d)\w+")),
     ('number', _re(r"(\d+\.\d*|\d+|\.\d+)(e[-+]?\d+)?")),
     ('open', _any('([{')),

@@ -1,5 +1,6 @@
 import itertools
 import traceback
+import tests.test_lexer
 import tests.test_ast
 import tests.test_emitters_esdl
 import tests.test_model
@@ -10,11 +11,12 @@ total_count = 0
 success_count = 0
 
 all_tests = list(itertools.chain(
-    tests.test_ast.__dict__.iteritems(),
-    tests.test_emitters_esdl.__dict__.iteritems(),
-    tests.test_model.__dict__.iteritems(),
-    tests.test_model_validator.__dict__.iteritems(),
-    tests.test_model_ast.__dict__.iteritems()
+    #vars(tests.test_lexer).iteritems(),
+    vars(tests.test_ast).iteritems(),
+    #tests.test_emitters_esdl.__dict__.iteritems(),
+    #tests.test_model.__dict__.iteritems(),
+    #tests.test_model_validator.__dict__.iteritems(),
+    #tests.test_model_ast.__dict__.iteritems()
 ))
 
 for key, value in all_tests:

@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{A4A7614E-DBDD-4FF8-8ABF-3D2C6EAC2F3D}</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>esdlc.py</StartupFile>
+    <StartupFile>run_tests.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
