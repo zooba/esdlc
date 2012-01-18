@@ -585,13 +585,15 @@ class EmitterScope(object):
                     groupname = self.safe_variable(var.name)
                     if groupname[-1] in '0123456789':
                         for i in xrange(len(groupname)):
-                            if groupname[-i] not in '0123456789':
-                                groupname2 = groupname[:-(i-1)] + str(int(groupname[-(i-1):]) + 1)
+                            if groupname[-(i+1)] not in '0123456789':
+                                groupname2 = groupname[:-i] + str(int(groupname[-i:]) + 1)
                                 break
                     else:
                         groupname2 = groupname + '1'
                     self.anonymous_variables[groupname] = groupname2
                     lines.append('auto %s = %s.evaluate_using(%s);' % (groupname2, groupname, evaluator))
+                    # TODO: Transfer contents of group back to original name at end of block
+                    
                     # TODO: Assign evaluator
                     #lines.append('%s.evaluated = false;' % groupname)
 
