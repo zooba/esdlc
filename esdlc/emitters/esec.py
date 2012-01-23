@@ -298,7 +298,7 @@ class _emitter(object): #pylint: disable=R0903
     def _emit_assign(self, expr):
         '''Emits code for assignment statements.'''
         dest = expr.parameter_dict['_destination']
-        if dest.tag == 'variableref':
+        if dest.tag == 'variable':
             self._emit_variable(dest.id, safe_access=True)
         else:
             self._emit_expression(dest)
@@ -322,7 +322,7 @@ class _emitter(object): #pylint: disable=R0903
         '''Emits code for expressions.'''
         tag = expr.tag
         
-        if tag in set(('groupref', 'variableref')):
+        if tag in frozenset(('groupref',)):
             self._emit_variable(expr.id)
         elif tag == 'variable':
             self._emit_variable(expr)
@@ -452,9 +452,9 @@ class _emitter(object): #pylint: disable=R0903
     def _emit_repeat(self, block):
         '''Emits code for REPEAT blocks.'''
         if (self.optimise > 1 and 
-            block.count.tag == 'variableref' and block.count.id.tag == 'variable' and 
-            block.count.id.constant and block.count.id.value <= 4):
-            for _ in xrange(int(block.count.id.value)):
+            block.count.tag == 'variable' and 
+            block.count.constant and block.count.value <= 4):
+            for _ in xrange(int(block.count.value)):
                 for stmt in block.statements:
                     self._emit(stmt)
         else:

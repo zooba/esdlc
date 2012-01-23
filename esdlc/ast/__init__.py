@@ -6,8 +6,9 @@ __all__ = ['parse', 'load']
 
 import itertools
 import esdlc.errors as error
-import esdlc.ast.nodes
+from esdlc.ast.nodes import Node
 from esdlc.ast.validator import Validator
+from esdlc.ast.lexer import TokenReader
 
 class AST(object):
     '''Produces an abstract syntax tree from source code.'''
@@ -65,139 +66,209 @@ class AST(object):
             if func:
                 return func(tokens)
             elif token.value == 'end':
-                return ('EndStmt',)
+                tokens.push_tokenset()
+                while tokens and tokens.current.tag != 'eos': tokens.move_next()
+                return Node('EndStmt', tokens=tokens.pop_tokenset())
             elif peek and peek.tag == 'assign':
                 return self.parse_assign_stmt(tokens)
             else:
                 return self.parse_expression(tokens)
         elif token.tag == 'pragma':
-            return ('PragmaStmt', token.value)
+            tokens.push_tokenset()
+            while tokens and tokens.current.tag != 'eos': tokens.move_next()
+            return Node('PragmaStmt', token.value, tokens=tokens.pop_tokenset())
         elif token.tag == 'comment':
-            return ('Comment', token.value)
+            return Node('Comment', token.value, tokens=[token])
         elif token.tag == 'eos':
             return None
         else:
             raise error.InvalidSyntaxError([token])
                 
     def parse_from_stmt(self, tokens):
+        tokens.push_tokenset()
         sources = self.parse_groups_or_generators(tokens.move_next())
         
         if not tokens.current or tokens.current.value != 'select':
+            tokens.drop_tokenset()
             raise error.ExpectedSelectError([tokens.current])
         
         destinations = self.parse_sized_groups(tokens.move_next())
         operators = self.parse_using(tokens)
 
-        return ('FromStmt', sources, destinations, operators)
+        return Node('FromStmt', sources, destinations, operators, tokens=tokens.pop_tokenset())
 
     def parse_join_stmt(self, tokens):
+        tokens.push_tokenset()
         sources = self.parse_groups_or_generators(tokens.move_next())
         
         if not tokens.current or tokens.current.value != 'into':
+            tokens.drop_tokenset()
             raise error.ExpectedIntoError([tokens.current])
         
         destinations = self.parse_sized_groups(tokens.move_next())
         operators = self.parse_using(tokens)
         
-        return ('JoinStmt', sources, destinations, operators)
+        return Node('JoinStmt', sources, destinations, operators, tokens=tokens.pop_tokenset())
 
     def parse_yield_stmt(self, tokens):
+        tokens.push_tokenset()
         sources = self.parse_groups(tokens.move_next())
-        return ('YieldStmt', sources)
+        return Node('YieldStmt', sources, tokens=tokens.pop_tokenset())
 
     def parse_eval_stmt(self, tokens):
+        tokens.push_tokenset()
         sources = self.parse_groups(tokens.move_next())
         operators = self.parse_using(tokens)
-        return ('EvalStmt', sources, operators)
+        return Node('EvalStmt', sources, operators, tokens=tokens.pop_tokenset())
 
     def parse_using(self, tokens):
-        if tokens.current and tokens.current.value == 'eos':
+        if not tokens.current or tokens.current.tag == 'eos':
             return []
         elif tokens.current and tokens.current.value == 'using':
             return self.parse_operators(tokens.move_next())
         else:
-            raise error.ExpectedUsingError([tokens.current])
+            raise error.ExpectedUsingError([tokens.current or tokens.last])
 
     def parse_begin_stmt(self, tokens):
+        tokens.push_tokenset()
         stmt = tokens.current
         tokens.move_next()
         if not tokens or tokens.current.tag != 'name':
+            tokens.drop_tokenset()
             raise error.ExpectedBlockNameError([stmt])
         name = tokens.current.value
         while tokens and tokens.current.tag != 'eos': tokens.move_next()
-        return ('BeginStmt', name)
+        return Node('BeginStmt', name, tokens=tokens.pop_tokenset())
 
     def parse_repeat_stmt(self, tokens):
+        tokens.push_tokenset()
         tokens.move_next()
         if not tokens:
+            tokens.drop_tokenset()
             raise error.ExpectedRepeatCountError([tokens.current])
         count = self.parse_expression(tokens)
         while tokens and tokens.current.tag != 'eos': tokens.move_next()
-        return ('RepeatStmt', count)
+        return Node('RepeatStmt', count, tokens=tokens.pop_tokenset())
+
+    def _parse_group_list(self, tokens, size_is_error = False, call_is_error = False):
+        group_tokens = [[]]
+        nesting = 0
+        
+        while tokens:
+            token = tokens.current
+            if token.tag == 'open':
+                nesting += 1
+                group_tokens[-1].append(token)
+            elif token.tag == 'close':
+                nesting -= 1
+                group_tokens[-1].append(token)
+            elif nesting == 0 and token.tag == 'comma':
+                group_tokens.append([])
+            elif nesting == 0 and token.tag == 'name' and token.value in frozenset(('select', 'into', 'using')):
+                break
+            elif token.tag == 'eos':
+                break
+            else:
+                group_tokens[-1].append(token)
+            tokens.move_next()
+
+        groups = []
+        any_errors = False
+        for group_token_list in group_tokens:
+            try:
+                if group_token_list[-1].tag == 'name':
+                    name = self.parse_operand(TokenReader(group_token_list[-1:]))
+                    if not name or len(name) != 2 or name[0] != 'Name' or not name[1]:
+                        raise error.InvalidGroupError(group_token_list)
+
+                    if len(group_token_list) > 1:
+                        if size_is_error:
+                            raise error.UnexpectedGroupSizeError(group_token_list, name[1])
+
+                        size = self.parse_expression(TokenReader(group_token_list[:-1]))
+                    else:
+                        size = None
+                    groups.append(Node('Group', size, name, tokens=group_token_list))
+                elif call_is_error:
+                    raise error.GeneratorAsDestinationError(group_token_list)
+                else:
+                    expr = self.parse_expression(TokenReader(group_token_list))
+                    groups.append(expr)
+            except error.ESDLSyntaxErrorBase as err:
+                self._errors.append(err)
+                any_errors = True
+                continue
+            
+        return groups if not any_errors else []
 
     def parse_groups(self, tokens):
-        groups = []
-        group_name = self.parse_expression(tokens)
-        
-        while group_name:
-            groups.append(group_name)
-
-            if not tokens or tokens.current.value != ',':
-                break
-
-            group_name = self.parse_expression(tokens.move_next())
-
-        return groups
+        return self._parse_group_list(tokens, size_is_error=True, call_is_error=True)
 
     def parse_sized_groups(self, tokens):
-        pass
+        return self._parse_group_list(tokens, size_is_error=False, call_is_error=True)
 
     def parse_groups_or_generators(self, tokens):
-        pass
+        return self._parse_group_list(tokens, size_is_error=True, call_is_error=False)
 
     def parse_operators(self, tokens):
-        pass
+        operators = []
+        for node in self._parse_group_list(tokens, size_is_error=True, call_is_error=False):
+            if node.tag == 'Group' and node[1] is None:
+                expr = Node('CallFunc', node[2], None, tokens=node.tokens)
+            elif node.tag != 'CallFunc':
+                expr = Node('CallFunc', node, None, tokens=node.tokens)
+            else:
+                expr = node
+            operators.append(expr)
+        return operators
 
     def parse_parameters(self, tokens):
         token = tokens.current
         peek = tokens.peek
+        tokens.push_tokenset()
 
         if not token or token.tag == 'close':
-            return None
+            return Node('ParameterList', [])
         elif token.tag != 'name':
             raise error.InvalidParameterNameError([token])
 
+        tokens.push_tokenset()
         parameters = []
         while token and token.tag == 'name':
             if peek.value == '=':
                 arg = self.parse_expression(tokens.move_next().move_next())
-                parameters.append((token.value, arg))
+                parameters.append(Node('Parameter', token.value, arg, tokens=tokens.pop_tokenset()))
             elif peek.value == ',':
-                parameters.append((token.value, None))
+                parameters.append(Node('Parameter', token.value, None, tokens=tokens.pop_tokenset()))
                 tokens.move_next()
             elif peek.value == ')':
-                parameters.append((token.value, None))
+                parameters.append(Node('Parameter', token.value, None, tokens=tokens.pop_tokenset()))
             else:
+                tokens.drop_tokenset()
+                tokens.drop_tokenset()
                 raise error.ExpectedParameterValueError([peek])
             
             if not tokens or tokens.current.value == ')':
                 break
             
             token = tokens.move_next().current
+            tokens.push_tokenset()
             peek = tokens.peek
 
-        return parameters
+        return Node('ParameterList', parameters, tokens=tokens.pop_tokenset())
 
     def parse_assign_stmt(self, tokens):
-        dest = tokens.current
-        tokens.move_next()
+        tokens.push_tokenset()
+        dest = self.parse_operand(tokens)
         if not tokens or tokens.current.value != '=':
+            tokens.drop_tokenset()
             raise error.InvalidSyntaxError([tokens.current or dest])
 
         src = self.parse_expression(tokens.move_next())
         if not src:
+            tokens.drop_tokenset()
             raise error.InvalidSyntaxError([tokens.current or dest])
-        return ('=', dest.value, src)
+        return Node('=', dest, src, tokens=tokens.pop_tokenset())
 
     CONSTANT_VALUES = {'true': True, 'false': False, 'null': None, 'none': None}
 
@@ -207,20 +278,23 @@ class AST(object):
         if not token:
             return None
 
+        tokens.push_tokenset()
         if token.tag == 'name':
             name = tokens.current.value
             tokens.move_next()
             if name in self.CONSTANT_VALUES:
-                return ('Constant', self.CONSTANT_VALUES[name])
+                return Node('Constant', self.CONSTANT_VALUES[name], tokens=tokens.pop_tokenset())
             else:
-                return ('Name', name)
+                return Node('Name', name, tokens=tokens.pop_tokenset())
         elif token.tag == 'number':
             tokens.move_next()
             try:
-                return ('Number', float(token.value))
+                node_tokens = tokens.pop_tokenset()
+                return Node('Number', float(token.value), node_tokens)
             except:
-                raise error.InvalidNumberError([token])
+                raise error.InvalidNumberError(node_tokens)
         elif token.tag == 'open':
+            tokens.drop_tokenset()
             open_bracket = token
             op = self.parse_expression(tokens.move_next())
             token = tokens.current
@@ -249,19 +323,19 @@ class AST(object):
 
             op = op_token.value
             if op == '(':
-                expr.append('CallFunc')
+                expr.append(Node('CallFunc', tokens=[tokens.current]))
                 expr.append(self.parse_parameters(tokens.move_next()))
                 if not tokens: raise error.InvalidFunctionCallError([op_token])
                 if tokens.current.value != ')': raise error.InvalidFunctionCallError([tokens.current])
                 tokens.move_next()
             elif op == '[':
-                expr.append('GetElement')
+                expr.append(Node('GetElement', tokens=[tokens.current]))
                 expr.append(self.parse_expression(tokens.move_next()))
                 if not tokens: raise error.UnmatchedBracketError([op_token], '[')
                 if tokens.current.value != ']': raise error.UnmatchedBracketError([tokens.current], '[')
                 tokens.move_next()
             else:
-                expr.append(op)
+                expr.append(Node(op, tokens=[tokens.current]))
                 tokens.move_next()
                 if tokens and tokens.current.tag == 'operator' and tokens.current.value in '+-':
                     operand = None
@@ -274,8 +348,9 @@ class AST(object):
             i = 0
             while i + 3 <= len(expr):
                 left, op, right = expr[i:i+3]
-                if op in match:
-                    expr[i:i+3] = [(op, left, right)]
+                if op.tag in match:
+                    tokens = (left.tokens if left else []) + op.tokens + (right.tokens if right else [])
+                    expr[i:i+3] = [Node(op.tag, left, right, tokens=tokens)]
                 else:
                     i += 2
 
@@ -283,8 +358,9 @@ class AST(object):
             i = 0
             while i + 3 <= len(expr):
                 left, op, right = expr[i:i+3]
-                if left is None and op in match:
-                    expr[i:i+3] = [(op, left, right)]
+                if left is None and op.tag in match:
+                    tokens=op.tokens + (right.tokens if right else [])
+                    expr[i:i+3] = [Node(op.tag, None, right, tokens=tokens)]
                 else:
                     i += 2
         
@@ -292,8 +368,9 @@ class AST(object):
             i = len(expr) - 3
             while i >= 0:
                 left, op, right = expr[i:i+3]
-                if op in match:
-                    expr[i:i+3] = [(op, left, right)]
+                if op.tag in match:
+                    tokens = (left.tokens if left else []) + op.tokens + (right.tokens if right else [])
+                    expr[i:i+3] = [Node(op.tag, left, right, tokens=tokens)]
                 i -= 2
         
         _reduce(expr, ('.', 'CallFunc', 'GetElement'))
@@ -305,51 +382,23 @@ class AST(object):
         
 
         assert len(expr) == 1
+        assert isinstance(expr[0], Node)
         return expr[0]
 
-    def format(self):
+    def __repr__(self):
         '''Returns a formatted string representation of the AST.
         '''
-        return str(self)
+        return ';'.join(''.join(stmt.format([], raw=True)) for stmt in self.expr)
 
     def __str__(self):
         '''Returns an abbreivated string representation of the AST.
         '''
-        def _fmt(node, result):
-            if node is None:
-                pass
-            elif isinstance(node, list):
-                result.append('[')
-                for item in node:
-                    _fmt(item, result)
-                    result.append(',')
-                if result[-1] == ',': result.pop()
-                result.append(']')
-            elif isinstance(node, tuple):
-                if node[0] == 'Name':
-                    result.append(str(node[1]))
-                elif node[0] == 'Number':
-                    result.append(str(node[1]))
-                elif node[0] == 'Constant':
-                    result.append('Constant{%s}' % (node[1] if node[1] is not None else 'None'))
-                else:
-                    _fmt(node[0], result)
-                    result.append('{')
-                    for item in node[1:]:
-                        _fmt(item, result)
-                        result.append(',')
-                    if result[-1] == ',': result.pop()
-                    result.append('}')
-            else:
-                result.append(str(node))
-            return result
-
-        return ';'.join(''.join(_fmt(stmt, [])) for stmt in self.expr)
+        return ';'.join(''.join(stmt.format([])) for stmt in self.expr)
 
 
 def parse(source):
     '''Loads an `AST` instance from the contents of `source`.'''
-    from esdlc.ast.lexer import TokenReader
+    import esdlc.ast.lexer
     tokens = TokenReader(esdlc.ast.lexer.tokenise(source))
         
     self = AST(tokens)
@@ -361,6 +410,3 @@ def load(path):
     '''
     with open(path) as src:
         return parse(src)
-
-import lexer
-a = AST(lexer.TokenReader(lexer.tokenise("a=1+2^-test(v=3*4)"), True))

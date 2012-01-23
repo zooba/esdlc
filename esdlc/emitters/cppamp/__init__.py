@@ -236,9 +236,11 @@ class EmitterScope(object):
                 elif isinstance(expr.value, float): return '%ff' % expr.value
                 else: return str(expr.value)
             return self.safe_variable(expr.name)
-        elif expr.tag == 'variableref':
-            return self._expr_to_string(expr.id)
-        elif expr.tag == 'groupref':
+        elif expr.tag == 'group':       # passing to a function
+            name = expr.name
+            name = self.group_alias.get(name) or self.global_scope.group_alias.get(name) or name
+            return self.safe_variable(name)
+        elif expr.tag == 'groupref':    # using in a store
             name = expr.id.name
             name = self.group_alias.get(name) or self.global_scope.group_alias.get(name) or name
             return self.safe_variable(name)
@@ -315,8 +317,6 @@ class EmitterScope(object):
 
             if name.tag == 'variable':
                 name = name.name
-            elif name.tag == 'variableref':
-                name = name.id.name
             else:
                 warn("Cannot write function for %s: %s" % (name.tag, name))
                 return ''
@@ -337,10 +337,10 @@ class EmitterScope(object):
         elif expr.name == '_assign':
             dest, src = expr.parameter_dict['_destination'], expr.parameter_dict['_source']
                 
-            if dest.tag == 'variableref':
+            if dest.tag == 'variable':
                 dest = self._expr_to_string(dest)
-                if src.tag == 'variableref' and src.id.constant:
-                    self.valid_constants[dest] = src.id.value
+                if src.tag == 'variable' and src.constant:
+                    self.valid_constants[dest] = src.value
                 if self.has(dest, 'allocated_variables'):
                     src = '(decltype(' + dest + '))' + self._expr_to_string(src)
                 else:

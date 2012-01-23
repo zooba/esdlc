@@ -106,7 +106,7 @@ def test_tokenise_line_ending():
 def test_tokenise_operator():
     yield check_tags, \
         '+ - * / % ^ ( ) { } [ ] = . , +-*/%^(){}[]=.,', \
-        ('operator '*6 + 'open close '*3 + 'operator '*3)*2 + 'eos'
+        ('operator '*6 + 'open close '*3 + 'assign operator comma ')*2 + 'eos'
     
     # each of these should be separate operators
     yield check_tags, \
@@ -116,21 +116,19 @@ def test_tokenise_operator():
 def test_tokenise_equation():
     yield check_tags, \
         'y = (-b + sqrt(b^2 - 4*a*c)) / (2 * a)', \
-        'name operator open operator name operator name open name operator number operator number ' + \
+        'name assign open operator name operator name open name operator number operator number ' + \
         'operator name operator name close close operator open number operator name close eos'
 
 def test_tokenise_functioncall():
     yield check_tags, \
         'class.method(param=value,   param = value[index+2],         param =   2.3 )', \
-        'name operator name open name operator name operator name operator name open name operator number ' + \
-        'close operator name operator number close eos'
+        'name operator name open name assign name comma name assign name open name operator number ' + \
+        'close comma name assign number close eos'
 
 CODE = r'''FROM random_real(length=cfg.length,lowest=-2.0,highest=2.0) SELECT (size) population
 YIELD population
 
 BEGIN GENERATION
-    targets = population
-    
     # Stochastic Universal Sampling for bases
     FROM population SELECT (size) bases USING fitness_sus(mu=size)
     
@@ -150,25 +148,23 @@ BEGIN GENERATION
 END GENERATION'''
 
 CODE_TOKENS = [
-    'name name open name operator name operator name operator name operator operator number operator name operator number close ' + \
+    'name name open name assign name operator name comma name assign operator number comma name assign number close ' + \
         'name open name close name eos',
     'name name eos',
     'eos',
     'name name eos',
-    'name operator name eos',
+    'comment eos',
+    'name name name open name close name name name open name assign name close eos',
     'eos',
     'comment eos',
-    'name name name open name close name name name open name operator name close eos',
+    'name name comma name comma name name name name name open name assign name close eos',
     'eos',
-    'comment eos',
-    'name name operator name operator name name name name name open name operator name close eos',
+    'name name name name name name open name assign name close eos',
     'eos',
-    'name name name name name name open name operator name close eos',
+    'name name comma name name name name name eos',
+    'name name name name name name open name assign name open number close close eos',
     'eos',
-    'name name operator name name name name name eos',
-    'name name name name name name open name operator name open number close close eos',
-    'eos',
-    'name name operator name name name name name eos',
+    'name name comma name name name name name eos',
     'name name name name name name eos',
     'eos',
     'name name eos',
@@ -180,8 +176,6 @@ CODE_VALUES = [
     'yield population',
     '',
     'begin generation',
-    'targets = population',
-    '',
     '# Stochastic Universal Sampling for bases',
     'from population select ( size ) bases using fitness_sus ( mu = size )',
     '',

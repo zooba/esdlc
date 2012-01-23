@@ -118,6 +118,7 @@ class TokenReader(object):
         self.i = 0
         self.skip_comments = skip_comments
         self.i_stack = []
+        self.token_stack = []
         
         if self.skip_comments:
             self.i = -1
@@ -143,7 +144,7 @@ class TokenReader(object):
         '''
         return self.tokens[-1] if self.tokens else None
     
-    def move_next(self):
+    def move_next(self, update_stacks=True):
         '''Advances to the next token. Returns `self` after advancing.
         If ``skip_comments`` was ``True``, tokens with tags beginning
         with ``'COMMENT'`` are skipped.
@@ -151,7 +152,14 @@ class TokenReader(object):
         self.i += 1
         if self.skip_comments:
             while self and self.current.tag.startswith('comment'):
+                if update_stacks:
+                    for stack in self.token_stack:
+                        stack.append(self.current)
                 self.i += 1
+
+        if self and update_stacks:
+            for stack in self.token_stack:
+                stack.append(self.current)
         return self
     
     @property
@@ -160,7 +168,7 @@ class TokenReader(object):
         ``self.move_next().current`` without modifying the position.
         '''
         self.push_location()
-        tok = self.move_next().current
+        tok = self.move_next(False).current
         self.pop_location()
         return tok
     
@@ -175,6 +183,18 @@ class TokenReader(object):
     def drop_location(self):
         '''Forgets the topmost location on the stack.'''
         self.i_stack.pop()
+    
+    def push_tokenset(self):
+        '''Starts caching tokens from here onwards.'''
+        self.token_stack.append([self.current])
+    
+    def pop_tokenset(self):
+        '''Returns the most recent token set.'''
+        return self.token_stack.pop()
+    
+    def drop_tokenset(self):
+        '''Forgets the most recent token set.'''
+        self.token_stack.pop()
 
 
 def tokenise(source):
