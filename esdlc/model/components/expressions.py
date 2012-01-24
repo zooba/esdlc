@@ -24,6 +24,8 @@ class GroupRef(object):
     
     def __str__(self):
         if self.limit:
+            if self.limit.tag == 'variable' and self.limit.constant:
+                return '(%d) %s' % (self.limit.value, self.id)
             return '(%s) %s' % (self.limit, self.id)
         else:
             return str(self.id)

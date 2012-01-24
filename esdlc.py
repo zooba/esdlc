@@ -3,7 +3,7 @@ import sys
 from esdlc import compileESDL
 import esdlc.emitters
 
-VERSION = '0.0.0.1'
+VERSION = '1.0'
 
 LOGO = r'''ESDL Multi-targeting Compiler %s
 Copyright (c) 2011 Steve Dower. All rights reserved.
@@ -78,21 +78,26 @@ def main(args):
     
     model, valid = compileESDL(opts.infile)
 
-    for name, emitter in emitters:
-        if emitter is None:
-            if opts.optimise_level < 99:
-                outfiles[outfile_i].write(model.ast.format())
+    if valid.all:
+        print 'Errors occurred'
+        for err in valid.all:
+            print err
+    else:
+        for name, emitter in emitters:
+            if emitter is None:
+                if opts.optimise_level < 99:
+                    outfiles[outfile_i].write(model.ast.format())
+                else:
+                    outfiles[outfile_i].write(str(model.ast))
             else:
-                outfiles[outfile_i].write(str(model.ast))
-        else:
-            code, context = emitter(model, out=outfiles[outfile_i], optimise_level=opts.optimise_level, profile=opts.profile)
-            if hasattr(context, 'get'):
-                compile_callback = context.get('__compile')
-                if hasattr(compile_callback, '__call__') and outpaths[outfile_i]:
-                    outfiles[outfile_i].close()
-                    compile_callback(outpaths[outfile_i])
-                    outfiles[outfile_i] = open(outpaths[outfile_i], 'a')
-        outfile_i = (outfile_i + 1) % len(outfiles)
+                code, context = emitter(model, out=outfiles[outfile_i], optimise_level=opts.optimise_level, profile=opts.profile)
+                if hasattr(context, 'get'):
+                    compile_callback = context.get('__compile')
+                    if hasattr(compile_callback, '__call__') and outpaths[outfile_i]:
+                        outfiles[outfile_i].close()
+                        compile_callback(outpaths[outfile_i])
+                        outfiles[outfile_i] = open(outpaths[outfile_i], 'a')
+            outfile_i = (outfile_i + 1) % len(outfiles)
 
 if __name__ == '__main__':
     #sys.exit(main(sys.argv[1:]))

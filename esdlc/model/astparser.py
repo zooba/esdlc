@@ -30,6 +30,7 @@ class AstSystem(System):
                                   for name, value in externals.iteritems())
         if ast is not None:
             self.read(ast)
+            self._errors.extend(ast._errors)
         
     def read(self, ast):
         '''Reads an abstract syntax tree into the model.
@@ -39,31 +40,34 @@ class AstSystem(System):
         '''
         if self.ast is not None:
             raise RuntimeError("Cannot call AstSystem.read() multiple times.")
-        if ast.errors:
-            raise ValueError("AST contains errors.")
+        #if ast.errors:
+        #    raise ValueError("AST contains errors.")
         self.ast = ast
 
+        block_stack = []
         block = []
+        self.block_names.append(self.INIT_BLOCK_NAME)
         blocks = {self.INIT_BLOCK_NAME: block}
         nesting = 0
 
         for stmt in ast.expr:
             if stmt is None or len(stmt) == 0:
                 pass
-            elif stmt[0] == 'BeginStmt' and nesting == 0:
+            elif stmt[0] == 'BeginStmt' and not block_stack:
                 block = []
                 self.block_names.append(stmt[1])
                 blocks[stmt[1]] = block
-                nesting = 1
+                block_stack.append(None)
+            elif stmt[0] == 'RepeatStmt':
+                block_stack.append(block)
+                new_block = []
+                block.append(type(stmt)(stmt[0], stmt[1], new_block))
+                block = new_block
             elif stmt[0] == 'EndStmt':
-                nesting -= 0
-                if nesting == 0:
-                    block = None
+                block = block_stack.pop()
             elif block is not None:
                 block.append(stmt)
         
-        self._active = self.blocks[self.INIT_BLOCK_NAME] = []
-        self._visit_block(blocks[self.INIT_BLOCK_NAME])
         for block_name in self.block_names:
             self._active = self.blocks[block_name] = []
             self._visit_block(blocks[block_name])
@@ -80,17 +84,19 @@ class AstSystem(System):
 
     def _repeatblock(self, block):
         '''Handles REPEAT blocks.'''
-        count_expr = self._expression(block.data)
+        count_expr = self._expression(block[1])
         previous = self._active
         self._active = stmts = []
-        self._visit_block(block.expr)
+        self._visit_block(block[2])
         self._active = previous
         return RepeatBlock(stmts, count_expr)
 
     def _visit_stmt(self, stmt):
         '''Dispatches control to the appropriate handler for `stmt`.'''
         tag = stmt[0]
-        if tag == '=':
+        if tag == 'Comment':
+            pass
+        elif tag == '=':
             self._add(self._assignment(stmt))
         elif tag == 'CallFunc':
             self._add(self._call(stmt))
@@ -106,6 +112,8 @@ class AstSystem(System):
             self._add(self._repeatblock(stmt))
         elif tag == 'PragmaStmt':
             self._add(Pragma(stmt[1], stmt.tokens))
+        elif tag == 'Name':
+            pass
         else:
             warn('Unhandled statement type: %r' % stmt)
 
@@ -118,7 +126,7 @@ class AstSystem(System):
         expr = None
         if node is None:
             return None
-        elif node.tag in frozenset('+-*/%^'):
+        elif node.tag in frozenset('+-*/%^,'):
             if node.left is None:
                 expr = UnaryOp(node.tag, self._expression(node.right), span=node.tokens)
             else:
@@ -277,8 +285,6 @@ class AstSystem(System):
 
         srcs = [self._groupref(group) for group in node[1]]
         evaluators = [self._call(evaluator) for evaluator in node[2]]
-
-        assert len(evaluators) == 1, "Only single evaluators are supported"
 
         return EvalStmt(srcs, evaluators)
 

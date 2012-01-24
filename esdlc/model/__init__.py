@@ -22,6 +22,7 @@ class System(object):
         self.externals = { }
         self.blocks = { }
         self.block_names = [ ]
+        self._errors = []
 
     def as_esdl(self):
         '''Converts this system back to ESDL.'''

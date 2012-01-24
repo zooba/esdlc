@@ -7,7 +7,6 @@ __all__ = ['parse', 'load']
 import itertools
 import esdlc.errors as error
 from esdlc.ast.nodes import Node
-from esdlc.ast.validator import Validator
 from esdlc.ast.lexer import TokenReader
 
 class AST(object):
@@ -76,8 +75,9 @@ class AST(object):
         elif token.tag == 'pragma':
             tokens.push_tokenset()
             while tokens and tokens.current.tag != 'eos': tokens.move_next()
-            return Node('PragmaStmt', token.value, tokens=tokens.pop_tokenset())
+            return Node('PragmaStmt', token.value[1:], tokens=tokens.pop_tokenset())
         elif token.tag == 'comment':
+            tokens.move_next()
             return Node('Comment', token.value, tokens=[token])
         elif token.tag == 'eos':
             return None
@@ -150,50 +150,63 @@ class AST(object):
         while tokens and tokens.current.tag != 'eos': tokens.move_next()
         return Node('RepeatStmt', count, tokens=tokens.pop_tokenset())
 
-    def _parse_group_list(self, tokens, size_is_error = False, call_is_error = False):
-        group_tokens = [[]]
-        nesting = 0
+    def _parse_group_list(self, tokens, size_is_error=False, call_is_error=False, assume_no_size=False):
+        group_tokens = []
+        nesting = []
         
+        group_token_list = []
         while tokens:
             token = tokens.current
             if token.tag == 'open':
-                nesting += 1
-                group_tokens[-1].append(token)
+                nesting.append(token)
+                group_token_list.append(token)
             elif token.tag == 'close':
-                nesting -= 1
-                group_tokens[-1].append(token)
-            elif nesting == 0 and token.tag == 'comma':
-                group_tokens.append([])
-            elif nesting == 0 and token.tag == 'name' and token.value in frozenset(('select', 'into', 'using')):
-                break
-            elif token.tag == 'eos':
+                nesting.pop()
+                group_token_list.append(token)
+            elif not nesting and token.tag == 'comma':
+                group_tokens.append((group_token_list, token))
+                group_token_list = []
+            elif (token.tag == 'eos' or
+                  (not nesting and token.tag == 'name' and token.value in frozenset(('select', 'into', 'using')))):
+                group_tokens.append((group_token_list, token))
+                group_token_list = []
                 break
             else:
-                group_tokens[-1].append(token)
+                group_token_list.append(token)
             tokens.move_next()
+        
+        if group_token_list:
+            group_tokens.append((group_token_list, None))
+        if nesting:
+            raise error.UnmatchedBracketError([nesting[0]], nesting[0].value)
 
         groups = []
         any_errors = False
-        for group_token_list in group_tokens:
+        for group_token_list, terminator in group_tokens:
             try:
-                if group_token_list[-1].tag == 'name':
-                    name = self.parse_operand(TokenReader(group_token_list[-1:]))
-                    if not name or len(name) != 2 or name[0] != 'Name' or not name[1]:
-                        raise error.InvalidGroupError(group_token_list)
-
-                    if len(group_token_list) > 1:
-                        if size_is_error:
-                            raise error.UnexpectedGroupSizeError(group_token_list, name[1])
-
-                        size = self.parse_expression(TokenReader(group_token_list[:-1]))
-                    else:
-                        size = None
-                    groups.append(Node('Group', size, name, tokens=group_token_list))
-                elif call_is_error:
-                    raise error.GeneratorAsDestinationError(group_token_list)
+                if not group_token_list:
+                    raise error.ExpectedGroupError([terminator])
                 else:
-                    expr = self.parse_expression(TokenReader(group_token_list))
-                    groups.append(expr)
+                    reader = TokenReader(group_token_list)
+                    size = self.parse_expression(reader)
+                    name = self.parse_operand(reader)
+                    if not name:
+                        name = size
+                        size = None
+                    
+                    if size_is_error and size:
+                        raise error.UnexpectedGroupSizeError(group_token_list, name[1])
+
+                    if name.tag == 'CallFunc':
+                        if call_is_error:
+                            raise error.GeneratorAsDestinationError(group_token_list)
+                        if size:
+                            raise error.UnexpectedGroupSizeError(group_token_list, name[1])
+                        groups.append(name)
+                    elif name.tag == 'Name':
+                        groups.append(Node('Group', size, name, tokens=group_token_list))
+                    else:
+                        raise error.InvalidGroupError(group_token_list)
             except error.ESDLSyntaxErrorBase as err:
                 self._errors.append(err)
                 any_errors = True
@@ -212,7 +225,7 @@ class AST(object):
 
     def parse_operators(self, tokens):
         operators = []
-        for node in self._parse_group_list(tokens, size_is_error=True, call_is_error=False):
+        for node in self._parse_group_list(tokens, size_is_error=True, call_is_error=False, assume_no_size=True):
             if node.tag == 'Group' and node[1] is None:
                 expr = Node('CallFunc', node[2], None, tokens=node.tokens)
             elif node.tag != 'CallFunc':
@@ -235,10 +248,10 @@ class AST(object):
         tokens.push_tokenset()
         parameters = []
         while token and token.tag == 'name':
-            if peek.value == '=':
+            if peek.tag == 'assign':
                 arg = self.parse_expression(tokens.move_next().move_next())
                 parameters.append(Node('Parameter', token.value, arg, tokens=tokens.pop_tokenset()))
-            elif peek.value == ',':
+            elif peek.tag == 'comma':
                 parameters.append(Node('Parameter', token.value, None, tokens=tokens.pop_tokenset()))
                 tokens.move_next()
             elif peek.value == ')':
@@ -296,7 +309,7 @@ class AST(object):
         elif token.tag == 'open':
             tokens.drop_tokenset()
             open_bracket = token
-            op = self.parse_expression(tokens.move_next())
+            op = self.parse_expression(tokens.move_next(), stop_at_comma=False)
             token = tokens.current
             if not token or token.tag != 'close':
                 raise error.UnmatchedBracketError([open_bracket], open_bracket.value)
@@ -305,7 +318,7 @@ class AST(object):
         else:
             return None
 
-    def parse_expression(self, tokens):
+    def parse_expression(self, tokens, stop_at_comma=True):
         if not tokens:
             return None
 
@@ -318,7 +331,9 @@ class AST(object):
 
         while tokens:
             op_token = tokens.current
-            if not op_token or op_token.tag not in ('open', 'operator'):
+            if not op_token or op_token.tag not in ('open', 'operator', 'comma'):
+                break
+            if stop_at_comma and op_token.tag == 'comma':
                 break
 
             op = op_token.value
@@ -330,7 +345,7 @@ class AST(object):
                 tokens.move_next()
             elif op == '[':
                 expr.append(Node('GetElement', tokens=[tokens.current]))
-                expr.append(self.parse_expression(tokens.move_next()))
+                expr.append(self.parse_expression(tokens.move_next(), stop_at_comma=False))
                 if not tokens: raise error.UnmatchedBracketError([op_token], '[')
                 if tokens.current.value != ']': raise error.UnmatchedBracketError([tokens.current], '[')
                 tokens.move_next()
@@ -379,6 +394,7 @@ class AST(object):
         _reduce_reverse(expr, '^')
         _reduce(expr, '*/')
         _reduce(expr, '+-')
+        _reduce(expr, ',')
         
 
         assert len(expr) == 1

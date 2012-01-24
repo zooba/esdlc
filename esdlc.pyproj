@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{A4A7614E-DBDD-4FF8-8ABF-3D2C6EAC2F3D}</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>run_tests.py</StartupFile>
+    <StartupFile>esdlc.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -16,7 +16,7 @@
     <InterpreterId>9a7a9026-48c1-4688-9d5d-e5699d47d074</InterpreterId>
     <InterpreterVersion>2.7</InterpreterVersion>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
-    <CommandLineArguments>/e:cppamp /o:"D:\Users\Steve\Documents\PhD\Thesis\Other Documents\CEC\de_esdlc\de_esdlc.cpp" /P "D:\Users\Steve\Documents\PhD\Thesis\Other Documents\CEC\de_esdlc\de_esdlc.esdl"</CommandLineArguments>
+    <CommandLineArguments>/e:esec test.esdl</CommandLineArguments>
     <InterpreterPath />
     <InterpreterArguments />
   </PropertyGroup>
@@ -30,7 +30,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="esdlc.py" />
-    <Compile Include="esdlc\ast\validator.py" />
     <Compile Include="esdlc\emitters\cppamp\built_in_template.py" />
     <Compile Include="esdlc\emitters\cppamp\opening_template.py" />
     <Compile Include="esdlc\emitters\cppamp\termination_template.py" />

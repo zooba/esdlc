@@ -274,7 +274,7 @@ class _emitter(object): #pylint: disable=R0903
         src = next(i.value for i in expr.parameters if i.name == '_function')
         args = [i for i in expr.parameters if i.name != '_function']
 
-        self._emit_expression(src.id)
+        self._emit_expression(src)
         self._w('(')
         if args:
             self._emit_param(args[0])
@@ -299,7 +299,7 @@ class _emitter(object): #pylint: disable=R0903
         '''Emits code for assignment statements.'''
         dest = expr.parameter_dict['_destination']
         if dest.tag == 'variable':
-            self._emit_variable(dest.id, safe_access=True)
+            self._emit_variable(dest, safe_access=True)
         else:
             self._emit_expression(dest)
         self._w(' = ')
@@ -385,6 +385,8 @@ class _emitter(object): #pylint: disable=R0903
             if group.limit is None:
                 self._wl(' = _group(_gen)')
                 break
+            elif group.limit.tag == 'variable' and group.limit.constant:
+                self._w(' = _group(_part(_gen, %d))' % group.limit.value)
             else:
                 self._w(' = _group(_part(_gen, ')
                 self._emit_expression(group.limit)

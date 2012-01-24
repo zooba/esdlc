@@ -31,12 +31,7 @@ def compileESDL(source, external_variables=None):
         source_file = '<string>'
         ast = esdlc.ast.parse(source)
     
-    if ast.errors:
-        model = None
-        validation = esdlc.model.Validator()
-        validation._errors.extend(ast._errors)  #pylint: disable=W0212
-    else:
-        model = esdlc.model.AstSystem(source_file=source_file, ast=ast, externals=external_variables)
-        validation = model.validate()
+    model = esdlc.model.AstSystem(source_file=source_file, ast=ast, externals=external_variables)
+    validation = model.validate()
 
     return model, validation

@@ -17,6 +17,8 @@ class Validator(object):
         self._known_names = { }
 
         if system is not None:
+            try: self._errors.extend(system._errors)
+            except AttributeError: pass
             for stmts in self.system.blocks.itervalues():
                 self._verify_stmts(stmts)
 
@@ -176,42 +178,48 @@ class Validator(object):
         seen_unlimited = False
         seen_function = False
         seen = set()
-        for i in groups:
-            try: limit = i.limit
+        for gref in groups:
+            if not isinstance(gref, (GroupRef, Function)):
+                self._errors.append(error.InvalidGroupError(gref.span))
+                continue
+
+            try: limit = gref.limit
             except AttributeError: limit = None
             if groups.allow_sizes:
                 if seen_unlimited:
-                    self._errors.append(error.InaccessibleGroupError(i.span, str(i)))
+                    self._errors.append(error.InaccessibleGroupError(gref.span, str(gref)))
                 seen_unlimited = seen_unlimited or (limit is None)
                 if limit is not None:
                     try:
                         self._verify_expression(limit)
-                        if isinstance(limit, Variable) and isinstance(i, GroupRef) and limit.name == i.id.name:
+                        if isinstance(limit, BinaryOp) and limit.op == ',':
+                            self._errors.append(error.InvalidGroupSizeError(limit.span))
+                        if isinstance(limit, Variable) and isinstance(gref, GroupRef) and limit.name == gref.id.name:
                             self._errors.append(error.InvalidGroupSizeError(limit.span))
                     except error.InvalidSyntaxError:
                         self._errors.append(error.InvalidGroupSizeError(limit.span))
             elif limit is not None:
-                self._errors.append(error.UnexpectedGroupSizeError(i.span, i.id.name))
+                self._errors.append(error.UnexpectedGroupSizeError(gref.span, gref.id.name))
             
             if groups.allow_one_generator and seen_function:
-                self._errors.append(error.InaccessibleGroupError(i.span, str(i)))
+                self._errors.append(error.InaccessibleGroupError(gref.span, str(gref)))
 
-            if isinstance(i, GroupRef):
-                self._verify_group(i.id, i.span)
-                if groups.repeats_error and i.id.name in seen:
-                    self._errors.append(groups.repeats_error(i.span, i.id.name))
-                seen.add(i.id.name)
-            elif isinstance(i, Function):
-                if groups.allow_generators: self._verify_function(i)
+            if isinstance(gref, GroupRef):
+                self._verify_group(gref.id, gref.span)
+                if groups.repeats_error and gref.id.name in seen:
+                    self._errors.append(groups.repeats_error(gref.span, gref.id.name))
+                seen.add(gref.id.name)
+            elif isinstance(gref, Function):
+                if groups.allow_generators: self._verify_function(gref)
                 elif groups.allow_one_generator:
-                    self._verify_function(i)
+                    self._verify_function(gref)
                     seen_function = True
-                else: self._errors.append(error.GeneratorAsDestinationError(i.span))
-            elif isinstance(i, Stream):
-                if groups.allow_streams: self._verify_stream(i)
-                else: self._errors.append(error.InvalidGroupError(i.span))
+                else: self._errors.append(error.GeneratorAsDestinationError(gref.span))
+            elif isinstance(gref, Stream):
+                if groups.allow_streams: self._verify_stream(gref)
+                else: self._errors.append(error.InvalidGroupError(gref.span))
             else:
-                self._errors.append(error.ExpectedGroupError(i.span))
+                self._errors.append(error.ExpectedGroupError(gref.span))
 
 
     def _verify_operator(self, stmt):
