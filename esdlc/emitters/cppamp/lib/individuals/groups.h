@@ -77,7 +77,6 @@ namespace esdl
             if (!ptr) return std::vector<IndividualType>();
             
             std::vector<IndividualType> result;
-            result.reserve(1000);
             copy(*ptr, std::back_inserter(result));
             return result;
         }

@@ -42,6 +42,29 @@ public:
         p_next = src_list[0].k;
     }
 
+    fitness_sus_t(SourceType source, const concurrency::array<IndividualType, 1>& offset, int mu) : mu(mu), pSource(source()) {
+        pSource.evaluate();
+        evalptr = pSource.evalptr;
+        auto keys = esdl_sort::parallel_sort_keys(*pSource);
+        src_list.reserve(keys->extent.size());
+        concurrency::copy(*keys, std::back_inserter(src_list));
+        
+        std::vector<IndividualType> offset_list;
+        concurrency::copy(offset, std::back_inserter(offset_list));
+
+        float min_fitness = offset_list.front().fitness;
+        float sum = 0;
+        std::for_each(std::begin(src_list), std::end(src_list), 
+            [&sum, min_fitness](KeyType& x) { x.k -= min_fitness; sum += x.k; });
+
+        const int _mu = (mu <= 0) ? src_list.size() : mu;
+
+        p_step = sum / _mu;
+        p = random_one() * p_step;
+        p_i = 0;
+        p_next = src_list[0].k;
+    }
+
     esdl::group<IndividualType, EvaluatorType> operator()(int count) {
         std::vector<int> index_list;
         index_list.reserve(count);
@@ -67,7 +90,18 @@ public:
     }
 };
 
+template<typename SourceType, typename OffsetEvaluatorType>
+fitness_sus_t<SourceType> fitness_sus(
+    SourceType source,
+    const esdl::group<typename esdl::tt::individual_type<SourceType>::type, OffsetEvaluatorType>& offset,
+    int mu) {
+    return fitness_sus_t<SourceType>(source, *offset, mu);
+}
+
 template<typename SourceType>
-fitness_sus_t<SourceType> fitness_sus(SourceType source, int mu) {
+fitness_sus_t<SourceType> fitness_sus(
+    SourceType source,
+    nullptr_t offset,
+    int mu) {
     return fitness_sus_t<SourceType>(source, mu);
 }

@@ -11,7 +11,7 @@
 
 #include "operators\merge.h"
 
-#include "operators\unique.h"
+#include "filters\unique.h"
 
 void test_unique() {
     test_start(L"Filter unique individuals");

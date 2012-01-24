@@ -212,6 +212,10 @@ namespace esdl_sort
         bool operator<(const FitnessIndex<IndividualType>& other) const restrict(cpu, direct3d) {
             return k > other.k || (k == other.k && i < other.i);
         }
+
+        operator KeyType() const restrict(cpu, direct3d) {
+            return k;
+        }
     };
 
     template<typename ElementType, int Length>

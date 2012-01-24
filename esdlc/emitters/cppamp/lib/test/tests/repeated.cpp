@@ -12,7 +12,7 @@
 #include "operators\merge.h"
 
 #include "selectors\repeated.h"
-#include "operators\unique.h"
+#include "filters\unique.h"
 
 void test_repeated() {
     test_start(L"Repeat individuals");

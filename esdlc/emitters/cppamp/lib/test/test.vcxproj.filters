@@ -56,22 +56,28 @@
     <ClCompile Include="tests\unique.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="fitness_sus.cpp">
+    <ClCompile Include="tests\best.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="crossover_tuple.cpp">
+    <ClCompile Include="tests\best_of_tuple.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="best_of_tuple.cpp">
+    <ClCompile Include="tests\crossover_tuple.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="uniform_random.cpp">
+    <ClCompile Include="tests\fitness_sus.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="best.cpp">
+    <ClCompile Include="tests\sort.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="sort.cpp">
+    <ClCompile Include="tests\uniform_random.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\uniform_shuffle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\fitness_proportional.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

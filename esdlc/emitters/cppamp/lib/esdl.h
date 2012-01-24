@@ -58,7 +58,7 @@ using concurrency::parallel_for_each;
 // ESDL operator: mutate_delta(step_size=(float)1, positive_rate=(float)0.5, per_indiv_rate=(float)1, per_gene_rate=(float)1, genes=(int)0)
 // ESDL operator: mutate_gaussian(mean=(float)0, sigma=(float)0.5, per_indiv_rate=(float)1, per_gene_rate=(float)1, genes=(int)0)
 
-#include "operators\unique.h"
+#include "filters\unique.h"
 // ESDL operator: unique()
 
 
@@ -74,10 +74,14 @@ using concurrency::parallel_for_each;
 
 #include "selectors\best.h"
 #include "selectors\uniform_random.h"
+#include "selectors\uniform_shuffle.h"
 #include "selectors\repeated.h"
+#include "selectors\fitness_proportional.h"
 #include "selectors\fitness_sus.h"
 // ESDL operator: best()
 // ESDL operator: worst()
 // ESDL operator: uniform_random()
+// ESDL operator: uniform_shuffle()
 // ESDL operator: repeated()
-// ESDL operator: fitness_sus(mu=(int)0)
+// ESDL operator: fitness_proportional(offset=nullptr, with_replacement=<bool>true, without_replacement=<bool>false)
+// ESDL operator: fitness_sus(offset=nullptr, mu=(int)0)

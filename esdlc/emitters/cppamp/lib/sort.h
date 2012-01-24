@@ -4,26 +4,30 @@
 
 namespace esdl_sort
 {
-    template<typename KeyType>
+    template<typename SourceType, typename KeyType>
     struct KeyIndex
     {
         KeyType k;
         int i;
 
         KeyIndex() restrict(cpu, direct3d) { }
-        KeyIndex(KeyType key, int index) restrict(cpu, direct3d) : k(key), i(index) { }
+        KeyIndex(SourceType key, int index) restrict(cpu, direct3d) : k((KeyType)key), i(index) { }
 
-        bool operator<(const KeyIndex<KeyType>& other) const restrict(cpu, direct3d) {
+        bool operator<(const KeyIndex<SourceType, KeyType>& other) const restrict(cpu, direct3d) {
             return k < other.k;
+        }
+
+        operator KeyType() const restrict(cpu, direct3d) {
+            return k;
         }
     };
 
     template<typename T>
-    struct key_index_type { typedef KeyIndex<T> type; };
+    struct key_index_type { typedef KeyIndex<T, float> type; };
     template<> struct key_index_type<float> { typedef float type; };
     template<> struct key_index_type<int> { typedef int type; };
     template<> struct key_index_type<unsigned int> { typedef unsigned int type; };
-    template<> struct key_index_type<double> { typedef KeyIndex<double> type; };
+    template<> struct key_index_type<double> { typedef KeyIndex<double, float> type; };
 
     namespace details
     {
