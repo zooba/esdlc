@@ -24,7 +24,7 @@ public:
             auto _rand = random_array(count, Length);
             auto& rand = *_rand;
             
-            parallel_for_each(esdl::acc, grid<2>(extent<2>(count, Length)),
+            parallel_for_each(group.accelerator_view, grid<2>(extent<2>(count, Length)),
                 [=, &group, &rand](index<2> i) restrict(direct3d) {
                     group(i[0]).genome[i[1]] = _lowest + (int)(rand[i] * (_highest - _lowest));
                     group(i[0]).fitness = 0;
@@ -33,7 +33,7 @@ public:
             });
         } else {
             const int _init = init;
-            parallel_for_each(esdl::acc, grid<2>(extent<2>(count, Length)),
+            parallel_for_each(group.accelerator_view, grid<2>(extent<2>(count, Length)),
                 [=, &group](index<2> i) restrict(direct3d) {
                     group(i[0]).genome[i[1]] = _init;
                     group(i[0]).fitness = 0;
@@ -48,6 +48,11 @@ public:
 template<typename length>
 _int_init_t<length::value, void> random_integer(length, int lowest, int highest) {
     return _int_init_t<length::value, void>(lowest, highest, 0, true);
+}
+
+template<typename length>
+_int_init_t<length::value, void> integer_value(length, int lowest, int highest, int value) {
+    return _int_init_t<length::value, void>(lowest, highest, value, false);
 }
 
 template<typename length>

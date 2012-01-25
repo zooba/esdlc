@@ -37,26 +37,42 @@ using concurrency::parallel_for_each;
 #include "individuals\real_variable.h"
 #include "individuals\int_fixed.h"
 #include "individuals\int_variable.h"
+#include "individuals\bin_fixed.h"
+#include "individuals\bin_variable.h"
 
 #include "individuals\real_fixed_generators.h"
 // ESDL generator: random_real(length=<int>10, lowest=(float)0, highest=(float)1)
+// ESDL generator: real_value(length=<int>10, lowest=(float)0, highest=(float)1, value=(float)0)
 // ESDL generator: real_low(length=<int>10, lowest=(float)0, highest=(float)1)
 // ESDL generator: real_mid(length=<int>10, lowest=(float)0, highest=(float)1)
 // ESDL generator: real_high(length=<int>10, lowest=(float)0, highest=(float)1)
 #include "individuals\int_fixed_generators.h"
-// ESDL generator: random_integer(length=<int>10, lowest=(int)0, highest=(int)99)
-// ESDL generator: integer_low(length=<int>10, lowest=(int)0, highest=(int)99)
-// ESDL generator: integer_mid(length=<int>10, lowest=(int)0, highest=(int)99)
-// ESDL generator: integer_high(length=<int>10, lowest=(int)0, highest=(int)99)
+// ESDL generator: random_integer(length=<int>10, lowest=(int)0, highest=(int)100)
+// ESDL generator: integer_value(length=<int>10, lowest=(int)0, highest=(int)100, value=(int)0)
+// ESDL generator: integer_low(length=<int>10, lowest=(int)0, highest=(int)100)
+// ESDL generator: integer_mid(length=<int>10, lowest=(int)0, highest=(int)100)
+// ESDL generator: integer_high(length=<int>10, lowest=(int)0, highest=(int)100)
+#include "individuals\bin_fixed_generators.h"
+// ESDL generator: random_binary(length=<int>10, true_rate=(float)0.5f)
+// ESDL generator: binary_true(length=<int>10)
+// ESDL generator: binary_false(length=<int>10)
 
 #include "operators\merge.h"
 
 #include "operators\mutate_random.h"
+#include "operators\mutate_bitflip.h"
 #include "operators\mutate_delta.h"
 #include "operators\mutate_gaussian.h"
 // ESDL operator: mutate_random(per_indiv_rate=(float)1, per_gene_rate=(float)0.1, genes=(int)0)
+// ESDL operator: mutate_bitflip(per_indiv_rate=(float)1, per_gene_rate=(float)0.1, genes=(int)0)
 // ESDL operator: mutate_delta(step_size=(float)1, positive_rate=(float)0.5, per_indiv_rate=(float)1, per_gene_rate=(float)1, genes=(int)0)
 // ESDL operator: mutate_gaussian(mean=(float)0, sigma=(float)0.5, per_indiv_rate=(float)1, per_gene_rate=(float)1, genes=(int)0)
+
+#include "operators\crossover.h"
+#include "operators\crossover_average.h"
+// ESDL operator: crossover(points=<int>1, per_pair_rate=(float)1.0, one_child=(bool)true, two_children=(bool)false)
+// ESDL operator: crossover_one(per_pair_rate=(float)1.0, one_child=(bool)true, two_children=(bool)false)
+// ESDL operator: crossover_average(per_pair_rate=(float)1.0, per_gene_rate=(float)0.1, genes=(int)0)
 
 #include "filters\unique.h"
 // ESDL operator: unique()

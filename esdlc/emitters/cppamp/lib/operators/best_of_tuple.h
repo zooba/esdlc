@@ -28,7 +28,7 @@ public:
         auto& src2 = *src.group2;
         auto& result = *pResult;
 
-        parallel_for_each(esdl::acc, result.grid, [&](index<1> i) restrict(direct3d) {
+        parallel_for_each(result.accelerator_view, result.grid, [&](index<1> i) restrict(direct3d) {
             result[i] = (src1[i].fitness > src2[i].fitness) ? src1[i] : src2[i];
         });
 
@@ -47,7 +47,7 @@ public:
         auto& src2 = *src.group2;
         auto& result = *pResult;
 
-        parallel_for_each(esdl::acc, result.grid, [&](index<1> i) restrict(direct3d) {
+        parallel_for_each(result.accelerator_view, result.grid, [&](index<1> i) restrict(direct3d) {
             result[i] = (src1[i].fitness > src2[i].fitness) ? src1[i] : src2[i];
         });
 
@@ -82,7 +82,7 @@ public:
         auto& src3 = *src.group3;
         auto& result = *pResult;
 
-        parallel_for_each(esdl::acc, result.grid, [&](index<1> i) restrict(direct3d) {
+        parallel_for_each(result.accelerator_view, result.grid, [&](index<1> i) restrict(direct3d) {
             if (src1[i].fitness > src2[i].fitness && src1[i].fitness > src3[i].fitness) {
                 result[i] = src1[i];
             } else if (src2[i].fitness > src1[i].fitness && src2[i].fitness > src3[i].fitness) {
@@ -109,7 +109,7 @@ public:
         auto& src3 = *src.group3;
         auto& result = *pResult;
 
-        parallel_for_each(esdl::acc, result.grid, [&](index<1> i) restrict(direct3d) {
+        parallel_for_each(result.accelerator_view, result.grid, [&](index<1> i) restrict(direct3d) {
             if (src1[i].fitness > src2[i].fitness && src[1].fitness > src[3].fitness) {
                 result[i] = src1[i];
             } else if (src2[i].fitness > src[1].fitness && src2[i].fitness > src3[i].fitness) {

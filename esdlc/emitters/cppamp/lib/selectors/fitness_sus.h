@@ -78,12 +78,11 @@ public:
             index_list.push_back(src_list[p_i].i);
         }
 
-        //concurrency::array_view<const int, 1> indices(index_list.size(), index_list);
-        concurrency::array<int, 1> indices(index_list.size(), std::begin(index_list), std::end(index_list), esdl::acc);
         auto pResult = esdl::make_group<IndividualType, EvaluatorType>(index_list.size(), evalptr);
         auto& src = *pSource;
         auto& result = *pResult;
-        parallel_for_each(esdl::acc, result.grid, [&](index<1> i) restrict(direct3d) {
+        concurrency::array<int, 1> indices(index_list.size(), std::begin(index_list), std::end(index_list), src.accelerator_view);
+        parallel_for_each(src.accelerator_view, result.grid, [&](index<1> i) restrict(direct3d) {
             result[i] = src[indices[i]];
         });
         return pResult;

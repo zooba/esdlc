@@ -77,6 +77,8 @@ namespace esdl
             struct individual_type<esdl::variable_individual<ElementType, Shortest, Longest>>
             { typedef esdl::variable_individual<ElementType, Shortest, Longest> type; };
 
+        template<typename T>
+            struct is_binary_individual : std::false_type { };
     }
 }
 

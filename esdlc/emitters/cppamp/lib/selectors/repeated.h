@@ -26,8 +26,9 @@ public:
         const int _taken = taken;
         taken += count;
 
-        parallel_for_each(esdl::acc, grid<1>(extent<1>(count)), [=, &src, &dest](index<1> i) restrict(direct3d) {
-            dest[i] = src[(i + _taken) % have];
+        parallel_for_each(src.accelerator_view, grid<1>(extent<1>(count)),
+            [=, &src, &dest](index<1> i) restrict(direct3d) {
+                dest[i] = src[(i + _taken) % have];
         });
 
         return pDest;

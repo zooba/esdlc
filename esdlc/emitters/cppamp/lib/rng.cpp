@@ -85,7 +85,7 @@ namespace
     void fill_array(array<float, Rank>& arr) {
         auto& _state = *state;
         const int count = (int)arr.extent.size();
-        parallel_for_each(esdl::acc, grid<1>(extent<1>(STATE_WIDTH)), [=, &_state, &arr](index<1> i) restrict(direct3d) {
+        parallel_for_each(arr.accelerator_view, grid<1>(extent<1>(STATE_WIDTH)), [=, &_state, &arr](index<1> i) restrict(direct3d) {
             for (int start = 0; start < count; start += STATE_WIDTH) {
                 if (i[0] + start < count) {
                     arr.data()[i[0] + start] = next_float(_state[i[0]]);
@@ -98,7 +98,7 @@ namespace
     void fill_normal_array(array<float, Rank>& arr) {
         auto& _state = *state;
         const int count = (int)arr.extent.size();
-        parallel_for_each(esdl::acc, grid<1>(extent<1>(STATE_WIDTH)), [=, &_state, &arr](index<1> i) restrict(direct3d) {
+        parallel_for_each(arr.accelerator_view, grid<1>(extent<1>(STATE_WIDTH)), [=, &_state, &arr](index<1> i) restrict(direct3d) {
             for (int start = 0; start < count; start += 2*STATE_WIDTH) {
                 float2 r = next_normal(_state[i[0]]);
                 if (i[0] + start < count) {

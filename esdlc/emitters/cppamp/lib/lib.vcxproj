@@ -64,7 +64,6 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <AdditionalIncludeDirectories>$(VSInstallDir)\Common7\IDE\Extensions\Microsoft\Concurrency Visualizer\SDK\Native\Inc;$(SolutionDir);$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <AssemblerOutput>AssemblyAndSourceCode</AssemblerOutput>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -76,6 +75,9 @@
     <ClInclude Include="command_line.h" />
     <ClInclude Include="cvmarkers.h" />
     <ClInclude Include="esdl.h" />
+    <ClInclude Include="individuals\bin_fixed.h" />
+    <ClInclude Include="individuals\bin_fixed_generators.h" />
+    <ClInclude Include="individuals\bin_variable.h" />
     <ClInclude Include="individuals\groups.h" />
     <ClInclude Include="individuals\individuals.h" />
     <ClInclude Include="individuals\int_fixed.h" />
@@ -88,8 +90,11 @@
     <ClInclude Include="joiners\random_tuples.h" />
     <ClInclude Include="joiners\tuples.h" />
     <ClInclude Include="operators\best_of_tuple.h" />
+    <ClInclude Include="operators\crossover.h" />
+    <ClInclude Include="operators\crossover_average.h" />
     <ClInclude Include="operators\crossover_tuple.h" />
     <ClInclude Include="operators\merge.h" />
+    <ClInclude Include="operators\mutate_bitflip.h" />
     <ClInclude Include="operators\mutate_delta.h" />
     <ClInclude Include="operators\mutate_gaussian.h" />
     <ClInclude Include="operators\mutate_random.h" />

@@ -85,11 +85,15 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="tests\bin_generators.cpp" />
     <ClCompile Include="tests\best.cpp" />
     <ClCompile Include="tests\best_of_tuple.cpp" />
+    <ClCompile Include="tests\crossover.cpp" />
+    <ClCompile Include="tests\crossover_average.cpp" />
     <ClCompile Include="tests\crossover_tuple.cpp" />
     <ClCompile Include="tests\fitness_proportional.cpp" />
     <ClCompile Include="tests\fitness_sus.cpp" />
+    <ClCompile Include="tests\mutate_bitflip.cpp" />
     <ClCompile Include="tests\uniform_shuffle.cpp" />
     <ClCompile Include="tests\sort.cpp" />
     <ClCompile Include="stdafx.cpp">

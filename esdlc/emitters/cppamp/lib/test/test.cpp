@@ -10,15 +10,21 @@ void test_sort();
 
 void test_real_generators_fixed();
 void test_int_generators_fixed();
+void test_bin_generators_fixed();
 
 void test_mutate_random_real();
 void test_mutate_random_int();
+
+void test_mutate_bitflip();
 
 void test_mutate_delta_real();
 void test_mutate_delta_int();
 
 void test_mutate_gaussian_real();
 void test_mutate_gaussian_int();
+
+void test_crossover();
+void test_crossover_average();
 
 void test_unique();
 void test_repeated();
@@ -64,9 +70,12 @@ int wmain(int argc, wchar_t* argv[]) {
         
         test_real_generators_fixed();
         test_int_generators_fixed();
+        test_bin_generators_fixed();
 
         test_mutate_random_real();
         test_mutate_random_int();
+
+        test_mutate_bitflip();
 
         test_mutate_delta_real();
         test_mutate_delta_int();
@@ -74,6 +83,9 @@ int wmain(int argc, wchar_t* argv[]) {
         test_mutate_gaussian_real();
         test_mutate_gaussian_int();
         
+        test_crossover();
+        test_crossover_average();
+
         test_unique();
         test_repeated();
     
