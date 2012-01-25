@@ -21,13 +21,6 @@ namespace esdl
         G1 group2;
         bool evaluated;
 
-        typename std::enable_if<std::is_constructible<E>::value>::type
-        evaluate() {
-            E()(*this);
-            evaluated = true;
-            return *this;
-        }
-        
         template<typename NewEvaluator>
         joinedgroup<2, NewEvaluator, G0, G1> evaluate_using(NewEvaluator) {
             static_assert(false, "evaluate_using is not yet implemented");
@@ -50,13 +43,6 @@ namespace esdl
         G1 group2;
         G2 group3;
         bool evaluated;
-
-        typename std::enable_if<std::is_constructible<E>::value>::type
-        evaluate() {
-            E()(*this);
-            evaluated = true;
-            return *this;
-        }
 
         template<typename NewEvaluator>
         joinedgroup<3, NewEvaluator, G0, G1, G2> evaluate_using(NewEvaluator) {

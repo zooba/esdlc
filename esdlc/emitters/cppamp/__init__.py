@@ -223,7 +223,7 @@ class EmitterScope(object):
                     warn("Unknown command in %s: %s" % (os.path.split(path)[1], line))
 
 
-    def _expr_to_string(self, expr):
+    def _expr_to_string(self, expr, as_integer=False):
         if isinstance(expr, str):
             return expr
         elif expr is None:
@@ -233,7 +233,7 @@ class EmitterScope(object):
                 if expr.value is True: return "true"
                 elif expr.value is False: return "false"
                 elif expr.value is None: return "nullptr"
-                elif isinstance(expr.value, float): return '%ff' % expr.value
+                elif isinstance(expr.value, float): return ('%d' if as_integer else '%ff') % expr.value
                 else: return str(expr.value)
             return self.safe_variable(expr.name)
         elif expr.tag == 'group':       # passing to a function
@@ -250,7 +250,7 @@ class EmitterScope(object):
         elif expr.tag == 'binaryop':
             return '(%s%s%s)' % (self._expr_to_string(expr.left), expr.op, self._expr_to_string(expr.right))
         elif expr.tag == 'unaryop':
-            return '(%s%s)' % (expr.op, self._expr_to_string(expr.right))
+            return '(%s%s)' % (expr.op, self._expr_to_string(expr.right, as_integer))
         else:
             warn("Cannot convert %s to string: %s" % (expr.tag, expr))
             return ''
@@ -295,7 +295,7 @@ class EmitterScope(object):
                         warn("Cannot use '%s' as templated bool parameter." % value)
                 elif p.cast == 'int' or p.cast == 'unsigned int':
                     try:
-                        int(value)
+                        value = int(self._expr_to_string(pvalue, as_integer=True))
                     except (TypeError, ValueError):
                         warn("Parameter '%s' requires a constant value. Using 10 instead." % p.name)
                         self.global_scope.valid_constants[p.name] = 10
@@ -304,8 +304,10 @@ class EmitterScope(object):
                     parts.append(', ')
                 else:
                     warn("Invalid parameter for templating: %s" % p)
-            else:
+            elif p.cast:
                 parts.extend(('(', p.cast, ')', value, ', '))
+            else:
+                parts.extend((value, ', '))
         if parts[-1] == ', ': parts.pop()
         parts.append(')')
         return ''.join(parts)
@@ -401,9 +403,16 @@ class EmitterScope(object):
         return self._funcobj_to_string(func, generator.parameter_dict)
 
     def _joiner_to_string(self, joiner, groups):
-        name = self._expr_to_string(joiner.parameter_dict['_function'])
-        name2 = name.replace('.', '::')
-        params = [i for i in joiner.parameter_dict.iterkeys() if i != '_function']
+        if joiner:
+            name = self._expr_to_string(joiner.parameter_dict['_function'])
+            params = [i for i in joiner.parameter_dict.iterkeys() if i != '_function']
+            param_dict = joiner.parameter_dict
+        else:
+            name = 'tuples'
+            params = []
+            param_dict = {}
+
+            name2 = name.replace('.', '::')
         
         func = (self._find_function(name, params, self.known_joiners) or 
                 self._find_function(name2, params, self.known_joiners))
@@ -412,7 +421,7 @@ class EmitterScope(object):
             return ''
 
         group_names = ['esdl::merge(%s)' % self._expr_to_string(i) for i in groups]
-        return self._funcobj_to_string(func, joiner.parameter_dict, group_names)
+        return self._funcobj_to_string(func, param_dict, group_names)
 
 
     def _store_to_lines(self, stmt):
@@ -460,8 +469,8 @@ class EmitterScope(object):
                     lines.append('auto _src_%d = esdl::merge(_merge_%d);' % (id, id))
         else:
             groups = op.sources
-            op = op_stack.pop()
-            lines.append('auto _src_%d = %s;' % (id, self._joiner_to_string(op.func, groups)))
+            op = op_stack.pop() if op_stack else None
+            lines.append('auto _src_%d = %s;' % (id, self._joiner_to_string(op.func if op else None, groups)))
         
         gen = '_src_%d' % id
         while op_stack:
@@ -592,6 +601,7 @@ class EmitterScope(object):
                         groupname2 = groupname + '1'
                     self.anonymous_variables[groupname] = groupname2
                     lines.append('auto %s = %s.evaluate_using(%s);' % (groupname2, groupname, evaluator))
+                    self.allocated_groups.add(groupname2)
                     # TODO: Transfer contents of group back to original name at end of block
                     
                     # TODO: Assign evaluator
