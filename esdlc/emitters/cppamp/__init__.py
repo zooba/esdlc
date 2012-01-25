@@ -299,6 +299,7 @@ class EmitterScope(object):
                     except (TypeError, ValueError):
                         warn("Parameter '%s' requires a constant value. Using 10 instead." % p.name)
                         self.global_scope.valid_constants[p.name] = 10
+                        self.uninitialised_variables.discard(p.name)
                         value = 10
                     parts.append('std::integral_constant<%s, %d>()' % (p.cast, value))
                     parts.append(', ')

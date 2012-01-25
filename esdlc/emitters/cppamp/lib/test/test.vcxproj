@@ -94,6 +94,7 @@
     <ClCompile Include="tests\fitness_proportional.cpp" />
     <ClCompile Include="tests\fitness_sus.cpp" />
     <ClCompile Include="tests\mutate_bitflip.cpp" />
+    <ClCompile Include="tests\tournament.cpp" />
     <ClCompile Include="tests\uniform_shuffle.cpp" />
     <ClCompile Include="tests\sort.cpp" />
     <ClCompile Include="stdafx.cpp">

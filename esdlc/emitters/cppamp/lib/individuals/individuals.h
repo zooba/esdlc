@@ -85,74 +85,74 @@ namespace esdl
 template<typename ElementType, int Length1, int Length2>
 bool operator ==(
     const esdl::fixed_individual<ElementType, Length1>& a,
-    const esdl::fixed_individual<ElementType, Length2>& b) {
+    const esdl::fixed_individual<ElementType, Length2>& b) restrict(cpu, direct3d) {
     return a.fitness == b.fitness;
 }
 template<typename ElementType, int Length1, int Length2>
 bool operator !=(
     const esdl::fixed_individual<ElementType, Length1>& a,
-    const esdl::fixed_individual<ElementType, Length2>& b) {
+    const esdl::fixed_individual<ElementType, Length2>& b) restrict(cpu, direct3d) {
     return !(a.fitness == b.fitness);
 }
 template<typename ElementType, int Length1, int Length2>
 bool operator <(
     const esdl::fixed_individual<ElementType, Length1>& a,
-    const esdl::fixed_individual<ElementType, Length2>& b) {
+    const esdl::fixed_individual<ElementType, Length2>& b) restrict(cpu, direct3d) {
     return a.fitness < b.fitness;
 }
 template<typename ElementType, int Length1, int Length2>
 bool operator <=(
     const esdl::fixed_individual<ElementType, Length1>& a,
-    const esdl::fixed_individual<ElementType, Length2>& b) {
+    const esdl::fixed_individual<ElementType, Length2>& b) restrict(cpu, direct3d) {
     return a.fitness < b.fitness || a.fitness == b.fitness;
 }
 template<typename ElementType, int Length1, int Length2>
 bool operator >=(
     const esdl::fixed_individual<ElementType, Length1>& a,
-    const esdl::fixed_individual<ElementType, Length2>& b) {
+    const esdl::fixed_individual<ElementType, Length2>& b) restrict(cpu, direct3d) {
     return !(a.fitness < b.fitness);
 }
 template<typename ElementType, int Length1, int Length2>
 bool operator >(
     const esdl::fixed_individual<ElementType, Length1>& a,
-    const esdl::fixed_individual<ElementType, Length2>& b) {
+    const esdl::fixed_individual<ElementType, Length2>& b) restrict(cpu, direct3d) {
     return !(a.fitness < b.fitness || a.fitness == b.fitness);
 }
 
 template<typename ElementType, int Shortest1, int Shortest2, int Longest1, int Longest2>
 bool operator ==(
     const esdl::variable_individual<ElementType, Shortest1, Longest1>& a,
-    const esdl::variable_individual<ElementType, Shortest2, Longest2>& b) {
+    const esdl::variable_individual<ElementType, Shortest2, Longest2>& b) restrict(cpu, direct3d) {
     return a.fitness == b.fitness;
 }
 template<typename ElementType, int Shortest1, int Shortest2, int Longest1, int Longest2>
 bool operator !=(
     const esdl::variable_individual<ElementType, Shortest1, Longest1>& a,
-    const esdl::variable_individual<ElementType, Shortest2, Longest2>& b) {
+    const esdl::variable_individual<ElementType, Shortest2, Longest2>& b) restrict(cpu, direct3d) {
     return !(a.fitness == b.fitness);
 }
 template<typename ElementType, int Shortest1, int Shortest2, int Longest1, int Longest2>
 bool operator <(
     const esdl::variable_individual<ElementType, Shortest1, Longest1>& a,
-    const esdl::variable_individual<ElementType, Shortest2, Longest2>& b) {
+    const esdl::variable_individual<ElementType, Shortest2, Longest2>& b) restrict(cpu, direct3d) {
     return a.fitness < b.fitness;
 }
 template<typename ElementType, int Shortest1, int Shortest2, int Longest1, int Longest2>
 bool operator <=(
     const esdl::variable_individual<ElementType, Shortest1, Longest1>& a,
-    const esdl::variable_individual<ElementType, Shortest2, Longest2>& b) {
+    const esdl::variable_individual<ElementType, Shortest2, Longest2>& b) restrict(cpu, direct3d) {
     return a.fitness < b.fitness || a.fitness == b.fitness;
 }
 template<typename ElementType, int Shortest1, int Shortest2, int Longest1, int Longest2>
 bool operator >=(
     const esdl::variable_individual<ElementType, Shortest1, Longest1>& a,
-    const esdl::variable_individual<ElementType, Shortest2, Longest2>& b) {
+    const esdl::variable_individual<ElementType, Shortest2, Longest2>& b) restrict(cpu, direct3d) {
     return !(a.fitness < b.fitness);
 }
 template<typename ElementType, int Shortest1, int Shortest2, int Longest1, int Longest2>
 bool operator >(
     const esdl::variable_individual<ElementType, Shortest1, Longest1>& a,
-    const esdl::variable_individual<ElementType, Shortest2, Longest2>& b) {
+    const esdl::variable_individual<ElementType, Shortest2, Longest2>& b) restrict(cpu, direct3d) {
     return !(a.fitness < b.fitness || a.fitness == b.fitness);
 }
 

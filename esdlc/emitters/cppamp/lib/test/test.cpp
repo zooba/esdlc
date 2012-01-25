@@ -30,8 +30,11 @@ void test_unique();
 void test_repeated();
 void test_best();
 void test_worst();
+void test_tournament();
 void test_uniform_random();
 void test_uniform_shuffle();
+void test_fitness_proportional();
+void test_fitness_sus();
 
 void test_tuples_2();
 void test_tuples_3();
@@ -42,8 +45,6 @@ void test_crossover_tuple_3();
 void test_best_of_tuple_2();
 void test_best_of_tuple_3();
 
-void test_fitness_proportional();
-void test_fitness_sus();
 
 
 PCV_PROVIDER _provider;
@@ -91,7 +92,11 @@ int wmain(int argc, wchar_t* argv[]) {
     
         test_best();
         test_worst();
+        test_tournament();
         test_uniform_random();
+        test_uniform_shuffle();
+        test_fitness_proportional();
+        test_fitness_sus();
 
         test_tuples_2();
         test_tuples_3();
@@ -101,9 +106,6 @@ int wmain(int argc, wchar_t* argv[]) {
         test_crossover_tuple_3();
         test_best_of_tuple_2();
         test_best_of_tuple_3();
-
-        test_fitness_proportional();
-        test_fitness_sus();
     }
 
     CvReleaseMarkerSeries(_series);

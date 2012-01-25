@@ -129,6 +129,9 @@
     <ClInclude Include="operators\crossover_average.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="selectors\tournament.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="rng.cpp">

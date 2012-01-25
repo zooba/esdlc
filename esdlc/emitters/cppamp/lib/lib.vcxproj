@@ -105,6 +105,7 @@
     <ClInclude Include="selectors\fitness_proportional.h" />
     <ClInclude Include="selectors\fitness_sus.h" />
     <ClInclude Include="selectors\repeated.h" />
+    <ClInclude Include="selectors\tournament.h" />
     <ClInclude Include="selectors\uniform_random.h" />
     <ClInclude Include="selectors\uniform_shuffle.h" />
     <ClInclude Include="sort.h" />

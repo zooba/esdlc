@@ -11,10 +11,10 @@
 #include "operators\merge.h"
 
 #include "selectors\best.h"
-#include "selectors\fitness_proportional.h"
+#include "selectors\tournament.h"
 
-void test_single_fitness_proportional_replace() {
-    test_start(L"Fitness-proportional selection (with replacement)");
+void test_single_tournament_replace() {
+    test_start(L"Tournament selection (with replacement)");
 
     auto _g1 = random_real(std::integral_constant<int, 10>(), 0.0, 10.0)(100);
     auto g1 = _g1.evaluate_using(std::make_shared<TestEvaluator>());
@@ -22,24 +22,23 @@ void test_single_fitness_proportional_replace() {
 
     auto g1l = g1.as_vector();
 
-    auto g2 = fitness_proportional(esdl::merge(g1), nullptr, std::true_type(), std::false_type())(100);
+    auto g2 = tournament(esdl::merge(g1), 2, 1.0f, std::true_type(), std::false_type())(100);
     auto g2l = g2.as_vector();
 
     assert_all(g2l, [](const Indiv& x) { return x.lowest == 0.0 && x.highest == 10.0; });
     _assert(g2l.size() == 100);
 
-    auto g3 = worst(esdl::merge(g1))(1);
-    auto g4 = fitness_proportional(esdl::merge(g1), g3, std::true_type(), std::false_type())(100);
-    auto g4l = g4.as_vector();
+    g2 = tournament(esdl::merge(g1), 7, 1.0f, std::true_type(), std::false_type())(100);
+    g2l = g2;
 
-    assert_all(g4l, [](const Indiv& x) { return x.lowest == 0.0 && x.highest == 10.0; });
-    _assert(g4l.size() == 100);
+    assert_all(g2l, [](const Indiv& x) { return x.lowest == 0.0 && x.highest == 10.0; });
+    _assert(g2l.size() == 100);
 
     test_pass();
 }
 
-void test_repeated_fitness_proportional_replace() {
-    test_start(L"Fitness-proportional selection (x100, with replacement)");
+void test_repeated_tournament_replace() {
+    test_start(L"Tournament selection (x100, with replacement)");
     
     auto _g1 = random_real(std::integral_constant<int, 10>(), 0.0, 10.0)(100);
     auto g1 = _g1.evaluate_using(std::make_shared<TestEvaluator>());
@@ -50,7 +49,7 @@ void test_repeated_fitness_proportional_replace() {
     double distribution[100] = {0};
 
     for (int i = 0; i < 100; ++i) {
-        auto g2 = fitness_proportional(esdl::merge(g1), nullptr, std::true_type(), std::false_type())(100);
+        auto g2 = tournament(esdl::merge(g1), 7, 1.0f, std::true_type(), std::false_type())(100);
         auto g2l = g2.as_vector();
 
         for (int j = 0; j < 100; ++j) {
@@ -68,8 +67,8 @@ void test_repeated_fitness_proportional_replace() {
     test_pass();
 }
 
-void test_single_fitness_proportional_no_replace() {
-    test_start(L"Fitness-proportional selection (without replacement)");
+void test_single_tournament_no_replace() {
+    test_start(L"Tournament selection (without replacement)");
 
     auto _g1 = random_real(std::integral_constant<int, 10>(), 0.0, 10.0)(100);
     auto g1 = _g1.evaluate_using(std::make_shared<TestEvaluator>());
@@ -77,25 +76,18 @@ void test_single_fitness_proportional_no_replace() {
 
     auto g1l = g1.as_vector();
 
-    auto g2 = fitness_proportional(esdl::merge(g1), nullptr, std::false_type(), std::false_type())();
-    auto g3 = fitness_proportional(esdl::merge(g1), nullptr, std::true_type(), std::true_type())();
+    auto g2 = tournament(esdl::merge(g1), 2, 1.0f, std::false_type(), std::false_type())();
+    auto g3 = tournament(esdl::merge(g1), 7, 1.0f, std::true_type(), std::true_type())();
     auto g2l = g2.as_vector();
 
     assert_all(g2l, [](const Indiv& x) { return x.lowest == 0.0 && x.highest == 10.0; });
     _assert(g2l.size() == 100);
 
-    auto g4 = worst(esdl::merge(g1))(1);
-    auto g5 = fitness_proportional(esdl::merge(g1), g4, std::true_type(), std::false_type())(100);
-    auto g5l = g5.as_vector();
-
-    assert_all(g5l, [](const Indiv& x) { return x.lowest == 0.0 && x.highest == 10.0; });
-    _assert(g5l.size() == 100);
-
     test_pass();
 }
 
-void test_repeated_fitness_proportional_no_replace() {
-    test_start(L"Fitness-proportional selection (x100, without replacement)");
+void test_repeated_tournament_no_replace() {
+    test_start(L"Tournament selection (x100, without replacement)");
     
     auto _g1 = random_real(std::integral_constant<int, 10>(), 0.0, 10.0)(100);
     auto g1 = _g1.evaluate_using(std::make_shared<TestEvaluator>());
@@ -106,8 +98,8 @@ void test_repeated_fitness_proportional_no_replace() {
     double distribution[100] = {0};
 
     for (int i = 0; i < 100; ++i) {
-        auto g2 = fitness_proportional(esdl::merge(g1), nullptr, std::false_type(), std::false_type())();
-        auto g3 = fitness_proportional(esdl::merge(g1), nullptr, std::true_type(), std::true_type())();
+        auto g2 = tournament(esdl::merge(g1), 7, 1.0f, std::false_type(), std::false_type())();
+        auto g3 = tournament(esdl::merge(g1), 2, 0.5f, std::true_type(), std::true_type())();
         auto g2l = g2.as_vector();
 
         for (int j = 0; j < 100; ++j) {
@@ -127,9 +119,9 @@ void test_repeated_fitness_proportional_no_replace() {
 
 
 
-void test_fitness_proportional() {
-    test_single_fitness_proportional_replace();
-    test_repeated_fitness_proportional_replace();
-    test_single_fitness_proportional_no_replace();
-    test_repeated_fitness_proportional_no_replace();
+void test_tournament() {
+    test_single_tournament_replace();
+    test_repeated_tournament_replace();
+    test_single_tournament_no_replace();
+    test_repeated_tournament_no_replace();
 }

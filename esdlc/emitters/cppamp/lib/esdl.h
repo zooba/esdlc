@@ -89,6 +89,7 @@ using concurrency::parallel_for_each;
 // ESDL operator: crossover_tuple(per_pair_rate=(float)1, per_gene_rate=(float)0.5)
 
 #include "selectors\best.h"
+#include "selectors\tournament.h"
 #include "selectors\uniform_random.h"
 #include "selectors\uniform_shuffle.h"
 #include "selectors\repeated.h"
@@ -96,6 +97,7 @@ using concurrency::parallel_for_each;
 #include "selectors\fitness_sus.h"
 // ESDL operator: best()
 // ESDL operator: worst()
+// ESDL operator: tournament(k=(int)2, greediness=(float)1.0, with_replacement=<bool>true, without_replacement=<bool>false)
 // ESDL operator: uniform_random()
 // ESDL operator: uniform_shuffle()
 // ESDL operator: repeated()

@@ -47,7 +47,7 @@ public:
 
         concurrency::array<float, 1> offset(keys.extent, keys.accelerator_view);
         parallel_for_each(keys.accelerator_view, keys.grid, [&](index<1> i) restrict(direct3d) {
-            offset[i] = keys[0].k;
+            offset[i] = keys[keys.extent.size() - 1].k;
         });
         parallel_for_each(keys.accelerator_view, keys.grid, [&](index<1> i) restrict(direct3d) {
             keys[i].k -= offset[i];
@@ -136,6 +136,25 @@ fitness_proportional(
     std::true_type, std::false_type) {
     return fitness_proportional_t<SourceType>(source);
 }
+
+template<typename SourceType, typename OffsetEvaluatorType>
+auto fitness_proportional(
+    SourceType source,
+    esdl::group<typename esdl::tt::individual_type<SourceType>::type, OffsetEvaluatorType> offset,
+    std::false_type, std::true_type)
+-> decltype(esdl::merge(fitness_proportional_t<SourceType>(source, *offset).take_all())) {
+    return esdl::merge(fitness_proportional_t<SourceType>(source, *offset).take_all());
+}
+
+template<typename SourceType>
+auto fitness_proportional(
+    SourceType source,
+    nullptr_t offset,
+    std::false_type, std::true_type) 
+-> decltype(esdl::merge(fitness_proportional_t<SourceType>(source).take_all())) {
+    return esdl::merge(fitness_proportional_t<SourceType>(source).take_all());
+}
+
 
 template<typename SourceType, typename OffsetEvaluatorType, typename same_bool>
 auto fitness_proportional(
