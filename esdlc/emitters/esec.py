@@ -386,7 +386,7 @@ class _emitter(object): #pylint: disable=R0903
                 self._wl(' = _group(_gen)')
                 break
             elif group.limit.tag == 'variable' and group.limit.constant:
-                self._w(' = _group(_part(_gen, %d))' % group.limit.value)
+                self._wl(' = _group(_part(_gen, %d))' % group.limit.value)
             else:
                 self._w(' = _group(_part(_gen, ')
                 self._emit_expression(group.limit)

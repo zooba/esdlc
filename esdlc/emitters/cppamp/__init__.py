@@ -121,8 +121,8 @@ class EmitterScope(object):
         return value in getattr(self, key) or (self.global_scope is not None and value in getattr(self.global_scope, key))
 
     def safe_variable(self, name):
-        if name in self.anonymous_variables:
-            return self.anonymous_variables[name]
+        while name in self.anonymous_variables:
+            name = self.anonymous_variables[name]
 
         name = name.replace('.', '::')
         m = re.match('^[a-z][a-z0-9_:]*$', name)
@@ -174,7 +174,7 @@ class EmitterScope(object):
         return func
 
     def _find_function(self, name, params, source):
-        candidates = [i for i in source if i.name == name]
+        candidates = [i for i in source if i.name.lower() == name]
 
         if candidates and len(candidates) > 1:
             candidates = [i for i in candidates if all(any(j.name == k.name for j in i.parameters) for k in params)]
@@ -503,6 +503,7 @@ class EmitterScope(object):
                     line += '(int)' + self._expr_to_string(group.limit)
                 lines.append(line + ');')
 
+                # TODO: Generate proper code here
                 part1, _, part2 = self.default_evaluator.partition('(')
                 evaluator = 'std::make_shared<%s>(%s' % (part1, part2)
 
@@ -560,6 +561,8 @@ class EmitterScope(object):
                         self.default_group = groupname
                         self.default_group_yielded = False
                         
+                elif stmt.text.startswith('cpp '):
+                    lines.append(stmt.text[4:])
                 else:
                     pass # ignore other pragmas silently
 
@@ -584,11 +587,17 @@ class EmitterScope(object):
                 lines.append('')
 
             elif stmt.tag == 'evalstmt':
+                # TODO: Generate proper code here
                 evaluator = None
                 if stmt.evaluators:
                     evaluator = self._evaluator_to_string(stmt.evaluators[0])
                     if len(stmt.evaluators) > 1:
                         warn("Multiple evaluators are not supported.")
+                else:
+                    evaluator = self.default_evaluator
+                id = self.store_id
+                self.store_id += 1
+                lines.append('auto _eval_%d = %s' % (id, evaluator))
 
                 for group in stmt.sources:
                     var = group if group.tag == 'variable' else group.id
@@ -601,12 +610,14 @@ class EmitterScope(object):
                     else:
                         groupname2 = groupname + '1'
                     self.anonymous_variables[groupname] = groupname2
-                    lines.append('auto %s = %s.evaluate_using(%s);' % (groupname2, groupname, evaluator))
+                    lines.append('auto %s = %s.evaluate_using(_eval_%d);' % (groupname2, groupname, id))
                     self.allocated_groups.add(groupname2)
                     # TODO: Transfer contents of group back to original name at end of block
                     
                     # TODO: Assign evaluator
                     #lines.append('%s.evaluated = false;' % groupname)
+                
+                lines.append('')
 
             elif stmt.tag == 'yieldstmt':
                 for group in stmt.sources:
