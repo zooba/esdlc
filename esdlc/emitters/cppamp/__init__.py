@@ -503,7 +503,6 @@ class EmitterScope(object):
                     line += '(int)' + self._expr_to_string(group.limit)
                 lines.append(line + ');')
 
-                # TODO: Generate proper code here
                 part1, _, part2 = self.default_evaluator.partition('(')
                 evaluator = 'std::make_shared<%s>(%s' % (part1, part2)
 
@@ -672,12 +671,15 @@ def emit(model, out=sys.stdout, optimise_level=0, profile=False):
 
     if not global_scope.default_group_yielded:
         if global_scope.default_group:
-            lines.extend(yield_template.get(global_scope.default_group, self.safe_variable(global_scope.default_group), True, True, True))
+            lines.extend(yield_template.get(global_scope.default_group, global_scope.safe_variable(global_scope.default_group), True, True, True))
             global_scope.default_group_yielded = True
         else:
             warn('Default group not specified in initialisation. Statistics and fitness termination are not available.')
 
     lines.extend(termination_template.get(global_scope.safe_variable(global_scope.default_group)))
+
+    if global_scope.selector:
+        lines.append('auto _current_block = %s%s;' % (global_scope.selector, '' if global_scope.selector.endswith(')') else '()'))
 
     block_i = 0
     for block_name in model.block_names:

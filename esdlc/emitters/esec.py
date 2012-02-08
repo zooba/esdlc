@@ -211,6 +211,9 @@ class _emitter(object): #pylint: disable=R0903
                 self._w(', ')
                 self._emit_expression(evaluator)
             self._wl(')')
+            eval_name = '_eval'
+        else:
+            eval_name = 'None'
         self._w('for _indiv in _merge(')
         self._emit_variable(stmt.sources[0].id)
         for group in itertools.islice(stmt.sources, 1, None):
@@ -218,7 +221,7 @@ class _emitter(object): #pylint: disable=R0903
             self._emit_variable(group.id)
         self._wl('):')
         self._indent += 1
-        self._wl('_indiv._eval = _eval')
+        self._wl('_indiv._eval = ' + eval_name)
         self._wl('del _indiv.fitness')
         self._indent -= 1
 
