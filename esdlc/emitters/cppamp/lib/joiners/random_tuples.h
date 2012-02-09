@@ -17,7 +17,7 @@ class random_tuples_t<2, distinct, Source1, Source2>  {
     Source2 source2;
 
 public:
-    typedef esdl::joinedgroup<2, void,
+    typedef esdl::joinedgroup<2,
         typename esdl::tt::group_type<Source1>::type,
         typename esdl::tt::group_type<Source2>::type
         > GroupType;
@@ -48,7 +48,7 @@ class random_tuples_t<3, distinct, Source1, Source2, Source3>  {
     Source3 source3;
 
 public:
-    typedef esdl::joinedgroup<3, void,
+    typedef esdl::joinedgroup<3,
         typename esdl::tt::group_type<Source1>::type, 
         typename esdl::tt::group_type<Source2>::type,
         typename esdl::tt::group_type<Source3>::type

@@ -17,8 +17,8 @@
 void test_uniform_shuffle() {
     test_start(L"Uniform shuffle selection");
     
-    auto _g1 = unique(random_real(std::integral_constant<int, 10>(), 0.0, 10.0))(100);
-    auto g1 = _g1.evaluate_using(std::make_shared<TestEvaluator>());
+    auto g1 = unique(random_real(std::integral_constant<int, 10>(), 0.0, 10.0))(100);
+    g1.evaluate_using(std::make_shared<TestEvaluator>());
     typedef esdl::tt::individual_type<decltype(g1)>::type Indiv;
 
     g1 = best(esdl::merge(g1))();

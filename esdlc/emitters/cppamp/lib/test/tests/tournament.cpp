@@ -16,8 +16,8 @@
 void test_single_tournament_replace() {
     test_start(L"Tournament selection (with replacement)");
 
-    auto _g1 = random_real(std::integral_constant<int, 10>(), 0.0, 10.0)(100);
-    auto g1 = _g1.evaluate_using(std::make_shared<TestEvaluator>());
+    auto g1 = random_real(std::integral_constant<int, 10>(), 0.0, 10.0)(100);
+    g1.evaluate_using(std::make_shared<TestEvaluator>());
     typedef esdl::tt::individual_type<decltype(g1)>::type Indiv;
 
     auto g1l = g1.as_vector();
@@ -40,8 +40,8 @@ void test_single_tournament_replace() {
 void test_repeated_tournament_replace() {
     test_start(L"Tournament selection (x100, with replacement)");
     
-    auto _g1 = random_real(std::integral_constant<int, 10>(), 0.0, 10.0)(100);
-    auto g1 = _g1.evaluate_using(std::make_shared<TestEvaluator>());
+    auto g1 = random_real(std::integral_constant<int, 10>(), 0.0, 10.0)(100);
+    g1.evaluate_using(std::make_shared<TestEvaluator>());
     typedef esdl::tt::individual_type<decltype(g1)>::type Indiv;
 
     auto g1l = g1.as_vector();
@@ -70,8 +70,8 @@ void test_repeated_tournament_replace() {
 void test_single_tournament_no_replace() {
     test_start(L"Tournament selection (without replacement)");
 
-    auto _g1 = random_real(std::integral_constant<int, 10>(), 0.0, 10.0)(100);
-    auto g1 = _g1.evaluate_using(std::make_shared<TestEvaluator>());
+    auto g1 = random_real(std::integral_constant<int, 10>(), 0.0, 10.0)(100);
+    g1.evaluate_using(std::make_shared<TestEvaluator>());
     typedef esdl::tt::individual_type<decltype(g1)>::type Indiv;
 
     auto g1l = g1.as_vector();
@@ -89,8 +89,8 @@ void test_single_tournament_no_replace() {
 void test_repeated_tournament_no_replace() {
     test_start(L"Tournament selection (x100, without replacement)");
     
-    auto _g1 = random_real(std::integral_constant<int, 10>(), 0.0, 10.0)(100);
-    auto g1 = _g1.evaluate_using(std::make_shared<TestEvaluator>());
+    auto g1 = random_real(std::integral_constant<int, 10>(), 0.0, 10.0)(100);
+    g1.evaluate_using(std::make_shared<TestEvaluator>());
     typedef esdl::tt::individual_type<decltype(g1)>::type Indiv;
 
     auto g1l = g1.as_vector();

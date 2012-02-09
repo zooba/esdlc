@@ -15,10 +15,9 @@ class tuples_t<2, Source1, Source2> {
     Source1 source1;
     Source2 source2;
 
-    typedef esdl::joinedgroup<
-        2, void,
-        esdl::group<typename esdl::tt::individual_type<Source1>::type, typename esdl::tt::evaluator_type<Source1>::type>,
-        esdl::group<typename esdl::tt::individual_type<Source2>::type, typename esdl::tt::evaluator_type<Source2>::type>
+    typedef esdl::joinedgroup<2,
+        esdl::group<typename esdl::tt::individual_type<Source1>::type>,
+        esdl::group<typename esdl::tt::individual_type<Source2>::type>
         > GroupType;
 public:
     
@@ -47,10 +46,10 @@ class tuples_t<3, Source1, Source2, Source3> {
     Source2 source2;
     Source3 source3;
 
-    typedef esdl::joinedgroup<3, void,
-        esdl::group<typename esdl::tt::individual_type<Source1>::type, typename esdl::tt::evaluator_type<Source1>::type>,
-        esdl::group<typename esdl::tt::individual_type<Source2>::type, typename esdl::tt::evaluator_type<Source2>::type>,
-        esdl::group<typename esdl::tt::individual_type<Source3>::type, typename esdl::tt::evaluator_type<Source3>::type>
+    typedef esdl::joinedgroup<3,
+        esdl::group<typename esdl::tt::individual_type<Source1>::type>,
+        esdl::group<typename esdl::tt::individual_type<Source2>::type>,
+        esdl::group<typename esdl::tt::individual_type<Source3>::type>
         > GroupType;
 public:
     

@@ -2,17 +2,16 @@
 
 #include "bin_fixed.h"
 
-template<int Length, typename EvaluatorType>
+template<int Length>
 class _bin_init_t {
     float true_rate;
 public:
     typedef bin_fixed_individual<Length> IndividualType;
-    typedef EvaluatorType EvaluatorType;
 
     _bin_init_t(float true_rate) : true_rate(true_rate) { }
 
-    esdl::group<IndividualType, EvaluatorType> operator()(int count) {
-        auto pGroup = esdl::make_group<IndividualType, EvaluatorType>(count);
+    esdl::group<IndividualType> operator()(int count) {
+        auto pGroup = esdl::make_group<IndividualType>(count);
         auto& group = *pGroup;
 
         const float _rate = true_rate;
@@ -44,16 +43,16 @@ public:
 };
 
 template<typename length>
-_bin_init_t<length::value, void> random_binary(length, float true_rate) {
-    return _bin_init_t<length::value, void>(true_rate);
+_bin_init_t<length::value> random_binary(length, float true_rate) {
+    return _bin_init_t<length::value>(true_rate);
 }
 
 template<typename length>
-_bin_init_t<length::value, void> binary_true(length) {
-    return _bin_init_t<length::value, void>(1.0f);
+_bin_init_t<length::value> binary_true(length) {
+    return _bin_init_t<length::value>(1.0f);
 }
 
 template<typename length>
-_bin_init_t<length::value, void> binary_false(length) {
-    return _bin_init_t<length::value, void>(0.0f);
+_bin_init_t<length::value> binary_false(length) {
+    return _bin_init_t<length::value>(0.0f);
 }

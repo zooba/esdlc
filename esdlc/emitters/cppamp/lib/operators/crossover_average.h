@@ -11,7 +11,6 @@ private:
     SourceType source;
 
     typedef typename esdl::tt::individual_type<SourceType>::type IndividualType;
-    typedef typename esdl::tt::evaluator_type<SourceType>::type EvaluatorType;
 
     float per_pair_rate, per_gene_rate;
     int genes;
@@ -19,19 +18,19 @@ public:
     crossover_average_t(SourceType source, float per_pair_rate, float per_gene_rate, int genes)
         : source(source), per_pair_rate(per_pair_rate), per_gene_rate(per_gene_rate), genes(genes) { }
 
-    esdl::group<IndividualType, EvaluatorType> operator()() {
+    esdl::group<IndividualType> operator()() {
         return exec(source());
     }
 
-    esdl::group<IndividualType, EvaluatorType> operator()(int count) {
+    esdl::group<IndividualType> operator()(int count) {
         return exec(source(count * 2));
     }
 private:
-    esdl::group<IndividualType, EvaluatorType> exec(const typename esdl::tt::group_type<SourceType>::type& src) {
+    esdl::group<IndividualType> exec(const typename esdl::tt::group_type<SourceType>::type& src) {
         const int count = src.size() / 2;
         auto& source = *src;
 
-        auto pResult = esdl::make_group<IndividualType, EvaluatorType>(count, src.evalptr);
+        auto pResult = esdl::make_group<IndividualType>(count);
         auto& result = *pResult;
 
         const int length = esdl::tt::length<IndividualType>::value;
@@ -69,6 +68,7 @@ private:
             });
         }
 
+        pResult.evaluate_using(src);
         return pResult;
     }
 };

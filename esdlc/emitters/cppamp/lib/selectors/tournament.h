@@ -10,7 +10,6 @@ template<typename SourceType>
 class tournament_t
 {
     typedef typename esdl::tt::individual_type<SourceType>::type IndividualType;
-    typedef typename esdl::tt::evaluator_type<SourceType>::type EvaluatorType;
 
     typename esdl::tt::group_type<SourceType>::type pSource;
 
@@ -25,7 +24,7 @@ public:
         pSource.evaluate();
     }
 
-    esdl::group<IndividualType, EvaluatorType> take_all() {
+    esdl::group<IndividualType> take_all() {
         const int count = pSource.size();
         auto& src = *pSource;
 
@@ -54,16 +53,17 @@ public:
             src_list.erase(src_list.begin() + j);
         }
 
-        auto pResult = esdl::make_group(result_list, pSource.evalptr);
+        auto pResult = esdl::make_group(result_list);
+        pResult.evaluate_using(pSource);
         pResult.evaluated = true;
         return pResult;
     }
 
-    esdl::group<IndividualType, EvaluatorType> operator()(int count) {
+    esdl::group<IndividualType> operator()(int count) {
         auto _rand = random_array(count, k + 1);
         auto& rand = *_rand;
         
-        auto pResult = esdl::make_group<IndividualType, EvaluatorType>(count, pSource.evalptr);
+        auto pResult = esdl::make_group<IndividualType>(count);
         auto& src = *pSource;
         auto& result = *pResult;
 
@@ -86,6 +86,7 @@ public:
             result(i[0]) = src(winner);
         });
 
+        pResult.evaluate_using(pSource);
         pResult.evaluated = true;
         return pResult;
     }

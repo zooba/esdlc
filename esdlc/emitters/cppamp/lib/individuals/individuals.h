@@ -161,25 +161,18 @@ namespace esdl
 {
     namespace tt
     {
-        template<typename IndividualType, typename EvaluatorType>
-            struct individual_type<esdl::group<IndividualType, EvaluatorType>>
+        template<typename IndividualType>
+            struct individual_type<esdl::group<IndividualType>>
             { typedef IndividualType type; };
         
-        template<typename T>
-            struct evaluator_type 
-            { typedef typename evaluator_type<typename group_type<T>::type>::type type; };
-        template<typename IndividualType, typename EvaluatorType>
-            struct evaluator_type<esdl::group<IndividualType, EvaluatorType>>
-            { typedef EvaluatorType type; };
-
         template<typename T>
             struct fitness_type
             { typedef float type; };
 
         template<typename T>
             struct is_group : std::false_type { };
-        template<typename IndividualType, typename EvaluatorType>
-            struct is_group<esdl::group<IndividualType, EvaluatorType>> : std::true_type { };
+        template<typename IndividualType>
+            struct is_group<esdl::group<IndividualType>> : std::true_type { };
             
         template<typename T>
             struct is_operator {
@@ -191,9 +184,9 @@ namespace esdl
                 static const bool value = sizeof(test<T>(0)) == sizeof(one);
             };
         
-        template<typename IndividualType, typename EvaluatorType>
-            struct group_type<esdl::group<IndividualType, EvaluatorType>>
-            { typedef esdl::group<IndividualType, EvaluatorType> type; };
+        template<typename IndividualType>
+            struct group_type<esdl::group<IndividualType>>
+            { typedef esdl::group<IndividualType> type; };
     }
 }
 

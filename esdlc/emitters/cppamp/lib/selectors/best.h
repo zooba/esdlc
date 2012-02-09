@@ -8,11 +8,11 @@
 template<typename SourceType>
 esdl::Merger_t<typename esdl::tt::group_type<SourceType>::type, 1> best(SourceType source) {
     typedef typename esdl::tt::individual_type<SourceType>::type IndividualType;
-    typedef typename esdl::tt::evaluator_type<SourceType>::type EvaluatorType;
 
     auto pSource = source();
     pSource.evaluate();
-    auto pResult = esdl::group<IndividualType, EvaluatorType>(esdl_sort::parallel_sort(*pSource, false), pSource.evalptr);
+    auto pResult = esdl::group<IndividualType>(esdl_sort::parallel_sort(*pSource, false));
+    pResult.evaluate_using(pSource);
     pResult.evaluated = true;
     return esdl::merge(pResult);
 }
@@ -20,11 +20,11 @@ esdl::Merger_t<typename esdl::tt::group_type<SourceType>::type, 1> best(SourceTy
 template<typename SourceType>
 esdl::Merger_t<typename esdl::tt::group_type<SourceType>::type, 1> worst(SourceType source) {
     typedef typename esdl::tt::individual_type<SourceType>::type IndividualType;
-    typedef typename esdl::tt::evaluator_type<SourceType>::type EvaluatorType;
 
     auto pSource = source();
     pSource.evaluate();
-    auto pResult = esdl::group<IndividualType, EvaluatorType>(esdl_sort::parallel_sort(*pSource, true), pSource.evalptr);
+    auto pResult = esdl::group<IndividualType>(esdl_sort::parallel_sort(*pSource, true));
+    pResult.evaluate_using(pSource);
     pResult.evaluated = true;
     return esdl::merge(pResult);
 }

@@ -8,7 +8,6 @@ template<typename SourceType>
 class unique_t {
     SourceType source;
     typedef typename esdl::tt::individual_type<SourceType>::type IndividualType;
-    typedef typename esdl::tt::evaluator_type<SourceType>::type EvaluatorType;
 
     struct indiv_less {
         bool operator() (const IndividualType& lhs, const IndividualType& rhs) const
@@ -24,15 +23,16 @@ class unique_t {
 public:
     unique_t(SourceType source) : source(source) { }
 
-    esdl::group<IndividualType, EvaluatorType> operator()(int count) {
+    esdl::group<IndividualType> operator()(int count) {
         bool evaluated = true;
-        std::shared_ptr<EvaluatorType> evaluator;
+        bool firstSrcSet = false;
+        esdl::group<IndividualType> firstSrc;
         std::list<IndividualType> indivs;
         std::set<IndividualType, indiv_less> seen;
 
         while (indivs.size() < (unsigned int)count) {
             auto src = source(count);
-            if (!evaluator) evaluator = src.evalptr;
+            if (!firstSrcSet) { firstSrc = src; firstSrcSet = true; }
             if (src.size() == 0) break;
             if (!src.evaluated) evaluated = false;
             auto src_list = src.as_list();
@@ -49,12 +49,13 @@ public:
             indivs.pop_back();
         }
 
-        auto result = esdl::make_group<IndividualType, EvaluatorType>(indivs, evaluator);
+        auto result = esdl::make_group<IndividualType>(indivs);
+        result.evaluate_using(firstSrc);
         result.evaluated = evaluated;
         return result;
     }
 
-    esdl::group<IndividualType, EvaluatorType> operator()() {
+    esdl::group<IndividualType> operator()() {
         auto src = source();
         auto src_list = src.as_list();
         decltype(src_list) indivs;
@@ -67,7 +68,8 @@ public:
             }
         }
 
-        auto result = esdl::make_group<IndividualType, EvaluatorType>(indivs, src.evalptr);
+        auto result = esdl::make_group<IndividualType>(indivs);
+        result.evaluate_using(src);
         result.evaluated = src.evaluated;
         return result;
     }

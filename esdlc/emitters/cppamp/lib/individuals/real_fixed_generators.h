@@ -2,20 +2,19 @@
 
 #include "real_fixed.h"
 
-template<int Length, typename EvaluatorType>
+template<int Length>
 class _real_init_t {
     float lowest, highest;
     float init;
     bool random;
 public:
     typedef real_fixed_individual<Length> IndividualType;
-    typedef EvaluatorType EvaluatorType;
 
     _real_init_t(float lowest, float highest, float init, bool random)
         : lowest(lowest), highest(highest), init(init), random(random) { }
 
-    esdl::group<IndividualType, EvaluatorType> operator()(int count) {
-        auto pGroup = esdl::make_group<IndividualType, EvaluatorType>(count);
+    esdl::group<IndividualType> operator()(int count) {
+        auto pGroup = esdl::make_group<IndividualType>(count);
         auto& group = *pGroup;
 
         const float _highest = highest;
@@ -47,26 +46,26 @@ public:
 };
 
 template<typename length>
-_real_init_t<length::value, void> random_real(length, float lowest, float highest) {
-    return _real_init_t<length::value, void>(lowest, highest, 0.0f, true);
+_real_init_t<length::value> random_real(length, float lowest, float highest) {
+    return _real_init_t<length::value>(lowest, highest, 0.0f, true);
 }
 
 template<typename length>
-_real_init_t<length::value, void> real_value(length, float lowest, float highest, float value) {
-    return _real_init_t<length::value, void>(lowest, highest, value, false);
+_real_init_t<length::value> real_value(length, float lowest, float highest, float value) {
+    return _real_init_t<length::value>(lowest, highest, value, false);
 }
 
 template<typename length>
-_real_init_t<length::value, void> real_low(length, float lowest, float highest) {
-    return _real_init_t<length::value, void>(lowest, highest, lowest, false);
+_real_init_t<length::value> real_low(length, float lowest, float highest) {
+    return _real_init_t<length::value>(lowest, highest, lowest, false);
 }
 
 template<typename length>
-_real_init_t<length::value, void> real_high(length, float lowest, float highest) {
-    return _real_init_t<length::value, void>(lowest, highest, highest, false);
+_real_init_t<length::value> real_high(length, float lowest, float highest) {
+    return _real_init_t<length::value>(lowest, highest, highest, false);
 }
 
 template<typename length>
-_real_init_t<length::value, void> real_mid(length, float lowest, float highest) {
-    return _real_init_t<length::value, void>(lowest, highest, lowest + (highest - lowest) / 2, false);
+_real_init_t<length::value> real_mid(length, float lowest, float highest) {
+    return _real_init_t<length::value>(lowest, highest, lowest + (highest - lowest) / 2, false);
 }

@@ -13,11 +13,9 @@ namespace esdl
     template<typename GroupType, int Count>
     class Merger_t {
         typedef typename tt::individual_type<GroupType>::type IndividualType;
-        typedef typename tt::evaluator_type<GroupType>::type EvaluatorType;
 
         GroupType groups[Count];
         int upToGroup, upToIndividual, availableCount;
-        std::shared_ptr<EvaluatorType> evalptr;
 
     public:
         Merger_t() : upToGroup(0), upToIndividual(0), availableCount(0) { }
@@ -27,7 +25,6 @@ namespace esdl
         {
             static_assert(Count == 1, "Must provide array for Count != 1");
             groups[0] = group;
-            evalptr = group.evalptr;
         }
 
         Merger_t(GroupType (&group_array)[Count])
@@ -37,16 +34,15 @@ namespace esdl
                 groups[i] = group_array[i];
                 availableCount += group_array[i].size();
             }
-            evalptr = groups[0].evalptr;
         }
 
         GroupType operator()(int count)
         {
             if (count > availableCount) count = availableCount;
 
-            if (count == 0) return make_group<IndividualType, EvaluatorType>();
+            if (count == 0) return make_group<IndividualType>();
 
-            auto pStream = make_group<IndividualType, EvaluatorType>(count, evalptr);
+            auto pStream = make_group<IndividualType>(count);
             auto& dest = *pStream;
 
             for (int i = 0; i < count; ) {
@@ -68,6 +64,7 @@ namespace esdl
             }
 
             availableCount -= pStream.size();
+            pStream.evaluate_using(groups[0]);
             return pStream;
         }
 
@@ -85,7 +82,6 @@ namespace esdl
     template<typename GroupType, int Count, typename Generator>
     struct MergerWithGenerator_t {
         typedef typename GroupType::IndividualType IndividualType;
-        typedef typename GroupType::EvaluatorType EvaluatorType;
 
         GroupType groups[Count];
         Generator generator;
@@ -108,9 +104,9 @@ namespace esdl
 
         GroupType operator()(int count)
         {
-            if (count <= 0) return make_group<IndividualType, EvaluatorType>();
+            if (count <= 0) return make_group<IndividualType>();
 
-            auto pStream = make_group<IndividualType, EvaluatorType>(count);
+            auto pStream = make_group<IndividualType>(count);
             auto& dest = *pStream;
 
             for (int i = 0; i < count; ) {
@@ -144,6 +140,7 @@ namespace esdl
             }
 
             availableCount -= pStream.size();
+            pStream.evaluate_using(group[0]);
             return pStream;
         }
     };
@@ -185,13 +182,6 @@ namespace esdl
         template<typename GroupType, int Count, typename GeneratorType>
             struct individual_type<MergerWithGenerator_t<GroupType, Count, GeneratorType>>
             { typedef typename individual_type<GroupType>::type type; };
-
-        template<typename GroupType, int Count>
-            struct evaluator_type<Merger_t<GroupType, Count>>
-            { typedef typename evaluator_type<GroupType>::type type; };
-        template<typename GroupType, int Count, typename GeneratorType>
-            struct evaluator_type<MergerWithGenerator_t<GroupType, Count, GeneratorType>>
-            { typedef typename evaluator_type<GroupType>::type type; };
     }
 
 
@@ -277,18 +267,18 @@ namespace esdl
         }
     };
 
-    template<int JoinCount, typename E, typename G0, typename G1, typename G2, typename G3, typename G4, int Count>
-    JoinedMerger_t<JoinCount, joinedgroup<JoinCount, E, G0, G1, G2, G3, G4>, Count>
-    merge(joinedgroup<JoinCount, E, G0, G1, G2, G3, G4> (&groups)[Count])
+    template<int JoinCount, typename G0, typename G1, typename G2, typename G3, typename G4, int Count>
+    JoinedMerger_t<JoinCount, joinedgroup<JoinCount, G0, G1, G2, G3, G4>, Count>
+    merge(joinedgroup<JoinCount, G0, G1, G2, G3, G4> (&groups)[Count])
     {
-        return JoinedMerger_t<JoinCount, joinedgroup<JoinCount, E, G0, G1, G2, G3, G4>, Count>(groups);
+        return JoinedMerger_t<JoinCount, joinedgroup<JoinCount, G0, G1, G2, G3, G4>, Count>(groups);
     }
 
-    template<int JoinCount, typename E, typename G0, typename G1, typename G2, typename G3, typename G4>
-    JoinedMerger_t<JoinCount, joinedgroup<JoinCount, E, G0, G1, G2, G3, G4>, 1>
-    merge(const joinedgroup<JoinCount, E, G0, G1, G2, G3, G4>& group)
+    template<int JoinCount, typename G0, typename G1, typename G2, typename G3, typename G4>
+    JoinedMerger_t<JoinCount, joinedgroup<JoinCount, G0, G1, G2, G3, G4>, 1>
+    merge(const joinedgroup<JoinCount, G0, G1, G2, G3, G4>& group)
     {
-        return JoinedMerger_t<JoinCount, joinedgroup<JoinCount, E, G0, G1, G2, G3, G4>, 1>(group);
+        return JoinedMerger_t<JoinCount, joinedgroup<JoinCount, G0, G1, G2, G3, G4>, 1>(group);
     }
 
     namespace tt

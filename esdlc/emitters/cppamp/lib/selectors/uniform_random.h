@@ -9,25 +9,26 @@ class uniform_random_t
 {
     SourceType source;
     typedef typename esdl::tt::individual_type<SourceType>::type IndividualType;
-    typedef typename esdl::tt::evaluator_type<SourceType>::type EvaluatorType;
+
+    typename esdl::tt::group_type<SourceType>::type pSource;
 public:
 
-    uniform_random_t(SourceType source) : source(source) { }
+    uniform_random_t(SourceType source) : pSource(source()) { }
 
-    esdl::group<IndividualType, EvaluatorType> operator()(int count) {
-        auto pSrc = source();
-        auto pResult = esdl::make_group<IndividualType, EvaluatorType>(count, pSrc.evalptr);
+    esdl::group<IndividualType> operator()(int count) {
+        auto pResult = esdl::make_group<IndividualType>(count);
         
-        auto& src = *pSrc;
+        auto& src = *pSource;
         auto& dest = *pResult;
         auto _rand = random_array(count);
         auto& rand = *_rand;
-        const int size = pSrc.size();
+        const int size = pSource.size();
 
         parallel_for_each(src.accelerator_view, dest.grid, [&, size](index<1> i) restrict(direct3d) {
             dest[i] = src[(int)(rand[i] * size)];
         });
 
+        pResult.evaluate_using(pSource);
         return pResult;
     }
 };

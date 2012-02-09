@@ -46,8 +46,8 @@ namespace esdl
         std::wstring _default_statistics_name;
     }
 
-    template<typename IndividualType, typename EvaluatorType>
-    std::vector<IndividualType> make_stats(const std::wstring& name, const group<IndividualType, EvaluatorType>& source)
+    template<typename IndividualType>
+    std::vector<IndividualType> make_stats(const std::wstring& name, const group<IndividualType>& source)
     {
         std::vector<IndividualType> group;
         group.reserve(source.size());

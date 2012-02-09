@@ -2,20 +2,19 @@
 
 #include "int_fixed.h"
 
-template<int Length, typename EvaluatorType>
+template<int Length>
 class _int_init_t {
     int lowest, highest;
     int init;
     bool random;
 public:
     typedef int_fixed_individual<Length> IndividualType;
-    typedef EvaluatorType EvaluatorType;
 
     _int_init_t(int lowest, int highest, int init, bool random)
         : lowest(lowest), highest(highest), init(init), random(random) { }
 
-    esdl::group<IndividualType, EvaluatorType> operator()(int count) {
-        auto pGroup = esdl::make_group<IndividualType, EvaluatorType>(count);
+    esdl::group<IndividualType> operator()(int count) {
+        auto pGroup = esdl::make_group<IndividualType>(count);
         auto& group = *pGroup;
 
         const int _highest = highest;
@@ -46,26 +45,26 @@ public:
 };
 
 template<typename length>
-_int_init_t<length::value, void> random_integer(length, int lowest, int highest) {
-    return _int_init_t<length::value, void>(lowest, highest, 0, true);
+_int_init_t<length::value> random_integer(length, int lowest, int highest) {
+    return _int_init_t<length::value>(lowest, highest, 0, true);
 }
 
 template<typename length>
-_int_init_t<length::value, void> integer_value(length, int lowest, int highest, int value) {
-    return _int_init_t<length::value, void>(lowest, highest, value, false);
+_int_init_t<length::value> integer_value(length, int lowest, int highest, int value) {
+    return _int_init_t<length::value>(lowest, highest, value, false);
 }
 
 template<typename length>
-_int_init_t<length::value, void> integer_low(length, int lowest, int highest) {
-    return _int_init_t<length::value, void>(lowest, highest, lowest, false);
+_int_init_t<length::value> integer_low(length, int lowest, int highest) {
+    return _int_init_t<length::value>(lowest, highest, lowest, false);
 }
 
 template<typename length>
-_int_init_t<length::value, void> integer_high(length, int lowest, int highest) {
-    return _int_init_t<length::value, void>(lowest, highest, highest, false);
+_int_init_t<length::value> integer_high(length, int lowest, int highest) {
+    return _int_init_t<length::value>(lowest, highest, highest, false);
 }
 
 template<typename length>
-_int_init_t<length::value, void> integer_mid(length, int lowest, int highest) {
-    return _int_init_t<length::value, void>(lowest, highest, lowest + (highest - lowest) / 2, false);
+_int_init_t<length::value> integer_mid(length, int lowest, int highest) {
+    return _int_init_t<length::value>(lowest, highest, lowest + (highest - lowest) / 2, false);
 }

@@ -10,13 +10,11 @@ class fitness_sus_t
     int mu;
 
     typedef typename esdl::tt::individual_type<SourceType>::type IndividualType;
-    typedef typename esdl::tt::evaluator_type<SourceType>::type EvaluatorType;
 
     typename esdl::tt::group_type<SourceType>::type pSource;
 
     typedef typename esdl_sort::key_index_type<typename esdl::tt::individual_type<SourceType>::type>::type KeyType;
     std::vector<KeyType> src_list;
-    std::shared_ptr<EvaluatorType> evalptr;
 
     float p, p_next, p_step;
     int p_i;
@@ -24,7 +22,6 @@ public:
 
     fitness_sus_t(SourceType source, int mu) : mu(mu), pSource(source()) {
         pSource.evaluate();
-        evalptr = pSource.evalptr;
         auto keys = esdl_sort::parallel_sort_keys(*pSource);
         src_list.reserve(keys->extent.size());
         concurrency::copy(*keys, std::back_inserter(src_list));
@@ -42,9 +39,9 @@ public:
         p_next = src_list[0].k;
     }
 
-    fitness_sus_t(SourceType source, const concurrency::array<IndividualType, 1>& offset, int mu) : mu(mu), pSource(source()) {
+    fitness_sus_t(SourceType source, const concurrency::array<IndividualType, 1>& offset, int mu)
+        : mu(mu), pSource(source()) {
         pSource.evaluate();
-        evalptr = pSource.evalptr;
         auto keys = esdl_sort::parallel_sort_keys(*pSource);
         src_list.reserve(keys->extent.size());
         concurrency::copy(*keys, std::back_inserter(src_list));
@@ -65,7 +62,7 @@ public:
         p_next = src_list[0].k;
     }
 
-    esdl::group<IndividualType, EvaluatorType> operator()(int count) {
+    esdl::group<IndividualType> operator()(int count) {
         std::vector<int> index_list;
         index_list.reserve(count);
 
@@ -78,21 +75,22 @@ public:
             index_list.push_back(src_list[p_i].i);
         }
 
-        auto pResult = esdl::make_group<IndividualType, EvaluatorType>(index_list.size(), evalptr);
+        auto pResult = esdl::make_group<IndividualType>(index_list.size());
         auto& src = *pSource;
         auto& result = *pResult;
         concurrency::array<int, 1> indices(index_list.size(), std::begin(index_list), std::end(index_list), src.accelerator_view);
         parallel_for_each(src.accelerator_view, result.grid, [&](index<1> i) restrict(direct3d) {
             result[i] = src[indices[i]];
         });
+        pResult.evaluate_using(pSource);
         return pResult;
     }
 };
 
-template<typename SourceType, typename OffsetEvaluatorType>
+template<typename SourceType>
 fitness_sus_t<SourceType> fitness_sus(
     SourceType source,
-    const esdl::group<typename esdl::tt::individual_type<SourceType>::type, OffsetEvaluatorType>& offset,
+    const esdl::group<typename esdl::tt::individual_type<SourceType>::type>& offset,
     int mu) {
     return fitness_sus_t<SourceType>(source, *offset, mu);
 }

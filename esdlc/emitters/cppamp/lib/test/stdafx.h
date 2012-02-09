@@ -80,7 +80,7 @@ struct TestEvaluator {
     TestEvaluator() { }
     
     template<typename IndividualType>
-    void operator()(esdl::group<IndividualType, TestEvaluator> group) const {
+    void operator()(esdl::group<IndividualType> group) const {
         auto& g = *group;
         concurrency::parallel_for_each(g.grid, [&](index<1> i) restrict(direct3d) {
             g[i].fitness = 0;

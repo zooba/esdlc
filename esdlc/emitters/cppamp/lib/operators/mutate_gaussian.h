@@ -11,18 +11,17 @@ class mutate_gaussian_t {
     float mean, sigma;
 
     typedef typename esdl::tt::individual_type<SourceType>::type IndividualType;
-    typedef typename esdl::tt::evaluator_type<SourceType>::type EvaluatorType;
 public:
 
     mutate_gaussian_t(SourceType source, float mean, float sigma, float per_indiv_rate, float per_gene_rate, int genes)
         : source(source), mean(mean), sigma(sigma), per_indiv_rate(per_indiv_rate), per_gene_rate(per_gene_rate), genes(genes)
     { }
 
-    esdl::group<IndividualType, EvaluatorType> operator()(int count) { return mutate(source(count)); }
-    esdl::group<IndividualType, EvaluatorType> operator()() { return mutate(source()); }
+    esdl::group<IndividualType> operator()(int count) { return mutate(source(count)); }
+    esdl::group<IndividualType> operator()() { return mutate(source()); }
 
 private:
-    esdl::group<IndividualType, EvaluatorType> mutate(esdl::group<IndividualType, EvaluatorType> pSrc) {
+    esdl::group<IndividualType> mutate(esdl::group<IndividualType> pSrc) {
         int count = pSrc.size();
         auto& src = *pSrc;
         auto pDest = make_group(pSrc);

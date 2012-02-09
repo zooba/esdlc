@@ -11,7 +11,6 @@ private:
     SourceType source;
 
     typedef typename esdl::tt::individual_type<SourceType>::type IndividualType;
-    typedef typename esdl::tt::evaluator_type<SourceType>::type EvaluatorType;
 
     float per_pair_rate;
     bool one_child;
@@ -19,23 +18,23 @@ public:
     crossover_t(SourceType source, float per_pair_rate, bool one_child)
         : source(source), per_pair_rate(per_pair_rate), one_child(one_child) { }
 
-    esdl::group<IndividualType, EvaluatorType> operator()() {
+    esdl::group<IndividualType> operator()() {
         return exec(source());
     }
 
-    esdl::group<IndividualType, EvaluatorType> operator()(int count) {
+    esdl::group<IndividualType> operator()(int count) {
         return exec(source(count * (one_child ? 2 : 1)));
     }
 private:
-    esdl::group<IndividualType, EvaluatorType> exec(const typename esdl::tt::group_type<SourceType>::type& src) {
+    esdl::group<IndividualType> exec(const typename esdl::tt::group_type<SourceType>::type& src) {
         const int count = src.size() / 2;
         auto& source = *src;
         const int length = esdl::tt::length<IndividualType>::value;
 
-        esdl::group<IndividualType, EvaluatorType> pResult;
+        esdl::group<IndividualType> pResult;
 
         if (one_child) {
-            pResult = esdl::make_group<IndividualType, EvaluatorType>(count, src.evalptr);
+            pResult = esdl::make_group<IndividualType>(count);
             auto& result = *pResult;
 
             auto _rand = random_array(count, points);
@@ -53,7 +52,7 @@ private:
                     result(i[0]).genome[i[1]] = source(i[0] * 2 + (crosses & 1)).genome[i[1]];
             });
         } else {
-            pResult = esdl::make_group<IndividualType, EvaluatorType>(count * 2, src.evalptr);
+            pResult = esdl::make_group<IndividualType>(count * 2);
             auto& result = *pResult;
             parallel_for_each(result.accelerator_view, result.grid, [&](index<1> i) restrict(direct3d) {
                 result[i] = source[i];
@@ -75,6 +74,7 @@ private:
             }
         }
 
+        pResult.evaluate_using(src);
         return pResult;
     }
 };
