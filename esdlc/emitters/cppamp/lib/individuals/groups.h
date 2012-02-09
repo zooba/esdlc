@@ -9,48 +9,48 @@
 
 namespace esdl
 {
+    template<typename GroupType>
     struct _evaluator_erased_t {
-        virtual void evaluate() = 0;
+        virtual void evaluate(GroupType& group) = 0;
     };
 
     template<typename GroupType, typename EvaluatorType>
-    struct _evaluator_t : _evaluator_erased_t {
-        void evaluate() {
+    struct _evaluator_t : _evaluator_erased_t<GroupType> {
+        void evaluate(GroupType& group) {
             (*ptr)(group);
             group.evaluated = true;
         }
 
-        _evaluator_t(GroupType& group, std::shared_ptr<EvaluatorType> evalptr)
-            : group(group), ptr(evalptr) { }
+        _evaluator_t(std::shared_ptr<EvaluatorType> evalptr)
+            : ptr(evalptr) { }
 
     private:
         std::shared_ptr<EvaluatorType> ptr;
-        GroupType& group;
     };
 
     template<typename GroupType>
-    struct _evaluator_t<GroupType, void> : _evaluator_erased_t {
-        void evaluate() { }
-        _evaluator_t(GroupType&, void*) { }
+    struct _evaluator_t<GroupType, void> : _evaluator_erased_t<GroupType> {
+        void evaluate(GroupType&) { }
+        _evaluator_t(void*) { }
     };
 
     template<typename IndividualType>
     class group
     {
         std::shared_ptr<concurrency::array<IndividualType, 1>> ptr;
-        std::shared_ptr<_evaluator_erased_t> evalptr;
+        std::shared_ptr<_evaluator_erased_t<group<IndividualType>>> evalptr;
     public:
         bool evaluated;
 
         void evaluate() {
             if (evalptr) {
-                evalptr->evaluate();
+                evalptr->evaluate(*this);
             }
         }
 
         template<typename EvaluatorType>
         void evaluate_using(std::shared_ptr<EvaluatorType> newEval) {
-            evalptr = std::make_shared<_evaluator_t<group<IndividualType>, EvaluatorType>>(*this, newEval);
+            evalptr = std::make_shared<_evaluator_t<group<IndividualType>, EvaluatorType>>(newEval);
             evaluated = false;
         }
 
@@ -65,8 +65,14 @@ namespace esdl
         group(std::shared_ptr<concurrency::array<IndividualType, 1>> p)
             : ptr(p), evaluated(false) { }
         group(const group<IndividualType>& other, bool deepCopy)
-            : ptr(deepCopy ? std::make_shared<concurrency::array<IndividualType, 1>>(*other, other->accelerator_view) : other.ptr),
-            evalptr(other.evalptr), evaluated(other.evaluated) { }
+            : evalptr(other.evalptr), evaluated(other.evaluated) {
+            if (deepCopy) {
+                ptr = std::make_shared<concurrency::array<IndividualType, 1>>(*other.ptr, other->accelerator_view);
+                concurrency::copy(*other.ptr, *ptr);
+            } else {
+                ptr = other.ptr;
+            }
+        }
         group(const concurrency::array<IndividualType, 1>& other)
             : ptr(std::make_shared<concurrency::array<IndividualType, 1>>(other, other.accelerator_view)), evaluated(false) { }
         group(const std::list<IndividualType>& list)
@@ -89,6 +95,7 @@ namespace esdl
             copy(*ptr, std::back_inserter(result));
             return result;
         }
+
         std::list<IndividualType> as_list() const { return (std::list<IndividualType>)(*this); }
 
         operator std::vector<IndividualType>() const {

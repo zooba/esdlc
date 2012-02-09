@@ -329,14 +329,6 @@ class EmitterScope(object):
                 return self._funcobj_to_string(func, expr.parameter_dict)
             return None
 
-        elif expr.name == '_alias':
-            dest, src = expr.parameter_dict['_destination'], expr.parameter_dict['_source']
-            dest = self._expr_to_string(dest)
-            src = self._expr_to_string(src)
-            self.group_alias[dest] = src
-            self.allocated_variables.add(dest)
-            self.uninitialised_variables.discard(dest)
-            return ''
         elif expr.name == '_assign':
             dest, src = expr.parameter_dict['_destination'], expr.parameter_dict['_source']
                 
@@ -497,22 +489,20 @@ class EmitterScope(object):
                     break
         else:
             for i, group in enumerate(stmt.destinations):
-                tempname1 = '_noeval_%d_%d' % (id, i)
-                line = 'auto %s = _gen_%d(' % (tempname1, id)
+                groupname = self._expr_to_string(group.id)
+                if self.has(groupname, 'allocated_groups'):
+                    line = groupname
+                else:
+                    line = 'auto ' + groupname
+                    self.allocated_groups.add(groupname)
+                    self.uninitialised_variables.discard(groupname)
+
+                line += ' = _gen_%d(' % id
                 if group.limit:
                     line += '(int)' + self._expr_to_string(group.limit)
                 lines.append(line + ');')
 
-                part1, _, part2 = self.default_evaluator.partition('(')
-                evaluator = 'std::make_shared<%s>(%s' % (part1, part2)
-
-                groupname = self._expr_to_string(group.id)
-                if self.has(groupname, 'allocated_groups'):
-                    lines.append('%s = %s.evaluate_using(%s);' % (groupname, tempname1, evaluator))
-                else:
-                    lines.append('auto %s = %s.evaluate_using(%s);' % (groupname, tempname1, evaluator))
-                    self.allocated_groups.add(groupname)
-                    self.uninitialised_variables.discard(groupname)
+                lines.append('%s.evaluate_using(_default_evaluator);' % groupname)
 
                 if not group.limit:
                     break
@@ -544,6 +534,11 @@ class EmitterScope(object):
                              (self.default_evaluator, evalname))
                     else:
                         self.default_evaluator = evalname
+                        part1, _, part2 = evalname.partition('(')
+                        if not part2.endswith(')'):
+                            part2 = ')'
+                        lines.append('auto _default_evaluator = std::make_shared<%s>(%s;' % (part1, part2))
+
                 elif stmt.text.startswith('selector '):
                     selname = stmt.text[9:].strip()
                     if self.selector:
@@ -586,7 +581,6 @@ class EmitterScope(object):
                 lines.append('')
 
             elif stmt.tag == 'evalstmt':
-                # TODO: Generate proper code here
                 evaluator = None
                 if stmt.evaluators:
                     evaluator = self._evaluator_to_string(stmt.evaluators[0])
@@ -596,26 +590,14 @@ class EmitterScope(object):
                     evaluator = self.default_evaluator
                 id = self.store_id
                 self.store_id += 1
-                lines.append('auto _eval_%d = %s' % (id, evaluator))
+                lines.append('auto _eval_%d = %s;' % (id, evaluator))
 
                 for group in stmt.sources:
                     var = group if group.tag == 'variable' else group.id
                     groupname = self.safe_variable(var.name)
-                    if groupname[-1] in '0123456789':
-                        for i in xrange(len(groupname)):
-                            if groupname[-(i+1)] not in '0123456789':
-                                groupname2 = groupname[:-i] + str(int(groupname[-i:]) + 1)
-                                break
-                    else:
-                        groupname2 = groupname + '1'
-                    self.anonymous_variables[groupname] = groupname2
-                    lines.append('auto %s = %s.evaluate_using(_eval_%d);' % (groupname2, groupname, id))
-                    self.allocated_groups.add(groupname2)
-                    # TODO: Transfer contents of group back to original name at end of block
-                    
-                    # TODO: Assign evaluator
-                    #lines.append('%s.evaluated = false;' % groupname)
-                
+                    lines.append('%s.evaluate_using(_eval_%d);' % (groupname, id))
+
+                lines.append('_eval_%d.reset();' % id)
                 lines.append('')
 
             elif stmt.tag == 'yieldstmt':
@@ -723,7 +705,7 @@ def emit(model, out=sys.stdout, optimise_level=0, profile=False):
             return
 
         if profile:
-            cmd = ['cl', '/Ox', '/GF', '/GR-', '/GL', '/EHsc', '/MP',
+            cmd = ['cl', '/Ox', '/GF', '/GR-', '/GL', '/EHsc', '/MP', 
                    '/I' + os.path.expandvars(r'%VSINSTALLDIR%Common7\IDE\Extensions\Microsoft\Concurrency Visualizer\SDK\Native\Inc'),
                    '/I' + os.path.join(here, 'lib'),
                    path,

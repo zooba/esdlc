@@ -7,6 +7,16 @@ struct int_fixed_individual : esdl::fixed_individual<int, Length> {
     int lowest, highest;
     int_fixed_individual() { }
     int_fixed_individual(int lowest, int highest) : lowest(lowest), highest(highest) { }
+
+    void operator=(const int_fixed_individual<Length>& other) restrict(cpu, direct3d)
+    {
+        for (int i = 0; i < Length; ++i) {
+            genome[i] = other.genome[i];
+        }
+        fitness = other.fitness;
+        lowest = other.lowest;
+        highest = other.highest;
+    }
 };
 
 namespace esdl

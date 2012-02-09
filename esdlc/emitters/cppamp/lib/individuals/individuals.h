@@ -13,6 +13,14 @@ namespace esdl
     struct fixed_individual {
         ElementType genome[Length];
         float fitness;
+
+        void operator=(const fixed_individual<ElementType, Length>& other) restrict(cpu, direct3d)
+        {
+            for (int i = 0; i < Length; ++i) {
+                genome[i] = other.genome[i];
+            }
+            fitness = other.fitness;
+        }
     };
 
     template<typename ElementType, int Shortest, int Longest>
@@ -20,6 +28,16 @@ namespace esdl
         ElementType genome[Longest];
         float fitness;
         int length;
+
+        variable_individual<ElementType, Shortest, Longest>& operator=(const variable_individual<ElementType, Shortest, Longest>& other) restrict(direct3d)
+        {
+            for (int i = 0; i < length; ++i) {
+                genome[i] = other.genome[i];
+            }
+            fitness = other.fitness;
+            length = other.length;
+            return *this;
+        }
     };
 
     namespace tt
@@ -58,8 +76,7 @@ namespace esdl
             struct minimum_length<esdl::variable_individual<ElementType, Shortest, Longest>> : std::integral_constant<int, Shortest> { };
 
         template<typename T>
-            struct group_type
-            {
+            struct group_type {
             private:
                 static auto callT(T* t=nullptr) -> decltype((*t)(0));
             public:

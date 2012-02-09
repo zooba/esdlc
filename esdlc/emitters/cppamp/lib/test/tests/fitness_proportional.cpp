@@ -97,7 +97,7 @@ void test_single_fitness_proportional_no_replace() {
 void test_repeated_fitness_proportional_no_replace() {
     test_start(L"Fitness-proportional selection (x100, without replacement)");
     
-    auto g1 = random_real(std::integral_constant<int, 10>(), 0.0, 10.0)(100);
+    auto g1 = random_real(std::integral_constant<int, 10>(), 1.0, 10.0)(100);
     g1.evaluate_using(std::make_shared<TestEvaluator>());
     typedef esdl::tt::individual_type<decltype(g1)>::type Indiv;
 
@@ -115,7 +115,7 @@ void test_repeated_fitness_proportional_no_replace() {
         }
     }
 
-    for (int i = 1; i < 100; ++i) {
+    for (int i = 1; i < 99; ++i) {
         distribution[i - 1] -= distribution[i];
     }
     distribution[99] = 0;

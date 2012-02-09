@@ -23,11 +23,12 @@ namespace esdl
 
         template<typename EvaluatorType>
         void evaluate_using(const std::shared_ptr<EvaluatorType>&) {
-            static_assert(fals"evaluate_using is not yet implemented");
+            static_assert(false, "evaluate_using is not yet implemented");
         }
 
         joinedgroup() : group1(), group2(), evaluated(false) { }
-        joinedgroup(G0 group1, G1 group2) : group1(group1), group2(group2), evaluated(false) { }
+        joinedgroup(G0 group1, G1 group2)
+            : group1(group1), group2(group2), evaluated(group1.evaluated && group2.evaluated) { }
 
         operator bool() const { return (bool)group1 && (bool)group2; }
 
@@ -46,13 +47,14 @@ namespace esdl
 
         template<typename EvaluatorType>
         joinedgroup<3, G0, G1, G2> evaluate_using(const std::shared_ptr<EvaluatorType>&) {
-            static_assert(fals"evaluate_using is not yet implemented");
+            static_assert(false, "evaluate_using is not yet implemented");
         }
 
         
         joinedgroup() : group1(), group2(), group3(), evaluated(false) { }
         joinedgroup(G0 group1, G1 group2, G2 group3)
-            : group1(group1), group2(group2), group3(group3), evaluated(false) { }
+            : group1(group1), group2(group2), group3(group3),
+            evaluated(group1.evaluated && group2.evaluated && group3.evaluated) { }
 
         operator bool() const { return (bool)group1 && (bool)group2 && (bool)group3; }
 

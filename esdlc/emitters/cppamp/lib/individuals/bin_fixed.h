@@ -5,6 +5,14 @@
 template<int Length>
 struct bin_fixed_individual : esdl::fixed_individual<int, Length> {
     bin_fixed_individual() { }
+
+    void operator=(const bin_fixed_individual<Length>& other) restrict(cpu, direct3d)
+    {
+        for (int i = 0; i < Length; ++i) {
+            genome[i] = other.genome[i];
+        }
+        fitness = other.fitness;
+    }
 };
 
 namespace esdl

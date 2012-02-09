@@ -202,8 +202,8 @@ namespace esdl
 
         JoinedMerger_t(GroupType (&group_array)[Count])
         {
-            typename GroupType::GroupType1 groups1[Count];
-            typename GroupType::GroupType2 groups2[Count];
+            typename esdl::tt::joined_group_type<GroupType, 0>::type groups1[Count];
+            typename esdl::tt::joined_group_type<GroupType, 1>::type groups2[Count];
 
             for (int i = 0; i < Count; ++i) {
                 groups1[i] = group_array[i].group1;
@@ -241,9 +241,9 @@ namespace esdl
 
         JoinedMerger_t(GroupType (&group_array)[Count])
         {
-            typename GroupType::GroupType1 groups1[Count];
-            typename GroupType::GroupType2 groups2[Count];
-            typename GroupType::GroupType3 groups3[Count];
+            typename esdl::tt::joined_group_type<GroupType, 0>::type groups1[Count];
+            typename esdl::tt::joined_group_type<GroupType, 1>::type groups2[Count];
+            typename esdl::tt::joined_group_type<GroupType, 2>::type groups3[Count];
 
             for (int i = 0; i < Count; ++i) {
                 groups1[i] = group_array[i].group1;

@@ -89,7 +89,7 @@ void test_single_tournament_no_replace() {
 void test_repeated_tournament_no_replace() {
     test_start(L"Tournament selection (x100, without replacement)");
     
-    auto g1 = random_real(std::integral_constant<int, 10>(), 0.0, 10.0)(100);
+    auto g1 = random_real(std::integral_constant<int, 10>(), 1.0, 10.0)(100);
     g1.evaluate_using(std::make_shared<TestEvaluator>());
     typedef esdl::tt::individual_type<decltype(g1)>::type Indiv;
 
@@ -107,12 +107,12 @@ void test_repeated_tournament_no_replace() {
         }
     }
 
-    for (int i = 1; i < 100; ++i) {
+    for (int i = 1; i < 99; ++i) {
         distribution[i - 1] -= distribution[i];
     }
     distribution[99] = 0;
 
-    assert_all(distribution, [](double d) { return (d + 2500.0) > 0.0; });
+    assert_all(distribution, [](double d) { return (d + 500.0) > 0.0; });
 
     test_pass();
 }

@@ -23,6 +23,7 @@ void test_uniform_random() {
     g1 = best(esdl::merge(g1))();
 
     auto g2 = uniform_random(esdl::merge(g1))(100);
+    g2.evaluate();
     auto g2l = g2.as_vector();
     assert_all(g2l, [](const Indiv& x) { return x.lowest == 0.0 && x.highest == 10.0; });
     _assert(g2l.size() == 100);

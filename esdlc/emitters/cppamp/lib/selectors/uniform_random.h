@@ -29,6 +29,7 @@ public:
         });
 
         pResult.evaluate_using(pSource);
+        pResult.evaluated = pSource.evaluated;
         return pResult;
     }
 };
