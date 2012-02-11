@@ -43,7 +43,7 @@ namespace esdl
         bool evaluated;
 
         void evaluate() {
-            if (evalptr) {
+            if (!evaluated && evalptr) {
                 evalptr->evaluate(*this);
             }
         }
