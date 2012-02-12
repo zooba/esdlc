@@ -238,7 +238,10 @@ class Validator(object):
 
     def _verify_group(self, group, span=None):
         '''Verifies a group.'''
-        assert isinstance(group, Variable), repr(group)
+        if not isinstance(group, Variable):
+            self._errors.append(error.InvalidGroupError(span or group.span, str(group)))
+            return
+
         if group.name in self.system.externals:
             self._errors.append(error.AmbiguousGroupGeneratorNameError(span or group.span, group.name))
         elif group.name not in self.system.variables:

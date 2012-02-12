@@ -241,7 +241,7 @@ class AstSystem(System):
         assert node.tag == 'Name', repr(node)
         
         var = self._variable(node)
-        return var if not var.external else Function.call(node, {}, node.tokens)
+        return var if not var.external else Function.call(var, {}, node.tokens)
 
     def _groupref(self, node):
         '''Handles group references, potentially included a size limit.
@@ -256,7 +256,9 @@ class AstSystem(System):
         if group_node.tag == 'Name':
             group = self._group(group_node)
 
-        if limit_node:
+        if isinstance(group, Function):
+            return group
+        elif limit_node:
             return GroupRef(group, limit=self._expression(limit_node), span=node.tokens)
         else:
             return GroupRef(group, limit=None, span=node.tokens)

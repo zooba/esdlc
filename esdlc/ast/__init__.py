@@ -16,9 +16,7 @@ class AST(object):
         self._errors = []
         
         self.expr = []
-        keep_going = True
-        while keep_going or stmt:
-            keep_going = False
+        while tokens:
             try:
                 stmt = self.parse_statement(tokens)
                 if stmt:
@@ -26,7 +24,6 @@ class AST(object):
                 if tokens and tokens.current.tag != 'eos':
                     self._errors.append(error.InvalidSyntaxError([tokens.current]))
             except error.ESDLSyntaxErrorBase as err:
-                keep_going = True
                 self._errors.append(err)
 
             while tokens and tokens.current.tag != 'eos': tokens.move_next()
@@ -203,7 +200,7 @@ class AST(object):
                         if size:
                             raise error.UnexpectedGroupSizeError(group_token_list, name[1])
                         groups.append(name)
-                    elif name.tag == 'Name':
+                    elif name.tag in frozenset(('Name', '.')):
                         groups.append(Node('Group', size, name, tokens=group_token_list))
                     else:
                         raise error.InvalidGroupError(group_token_list)

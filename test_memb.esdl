@@ -8,3 +8,5 @@ x = config.func(param1=value).subfunc(param2=value)
 x = config[index]
 x = config.member[index]
 x = config[index].member
+
+EVAL pop USING config.member

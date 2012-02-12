@@ -45,8 +45,8 @@ def test_errors():
     yield check_error, "A=A,,,", [error.InvalidSyntaxError]
     yield check_error, "A=,,A,,", [error.InvalidSyntaxError]
     yield check_error, "A=A, B, ", [error.InvalidSyntaxError]
-    yield check_error, "A=(A, B, )", [error.UnmatchedBracketError]
-    yield check_error, "A=(A, ,B)", [error.UnmatchedBracketError]
+    yield check_error, "A=(A, B, )", [error.InvalidSyntaxError]
+    yield check_error, "A=(A, ,B)", [error.InvalidSyntaxError]
 
 def test_arithmetic_without_parens():
     for op in "+-*/^%":
@@ -169,7 +169,7 @@ def test_function_call():
 
 
 def test_pragma():
-    yield check, "`Any Text Here", "PragmaStmt{`Any Text Here}"
+    yield check, "`Any Text Here", "PragmaStmt{Any Text Here}"
 
 def test_comments():
     yield check, "A = B + C # comment", "={a,+{b,c}}"
@@ -286,7 +286,7 @@ EvalStmt{[Group{,population}],[CallFunc{.{evaluators,population},[t{}]}]}
 YieldStmt{[Group{,population}]}
 BeginStmt{generation}
 ={t,+{t,*{delta_t,1.4}}}
-PragmaStmt{`print t}
+PragmaStmt{print t}
 RepeatStmt{10.0}
 FromStmt{[Group{,population}],[Group{100.0,parents}],[CallFunc{tournament,[k{2.0},greediness{0.7}]}]}
 FromStmt{[Group{,parents}],[Group{,mutated}],[CallFunc{mutate_delta,[stepsize{}]}]}
