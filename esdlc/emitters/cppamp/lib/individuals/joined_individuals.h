@@ -34,6 +34,10 @@ namespace esdl
 
         int size() const { return group1 ? group1.size() : 0; }
         void reset() { group1.reset(); group2.reset(); evaluated = false; }
+
+        template<int Index> void get() { }
+        template<> G0& get<1>() { return group1; }
+        template<> G1& get<2>() { return group2; }
     };
 
     template<typename G0, typename G1, typename G2>
@@ -60,6 +64,11 @@ namespace esdl
 
         int size() const { return group1 ? group1.size() : 0; }
         void reset() { group1.reset(); group2.reset(); group3.reset(); evaluated = false; }
+
+        template<int Index> void get() { }
+        template<> G0& get<1>() { return group1; }
+        template<> G1& get<2>() { return group2; }
+        template<> G2& get<3>() { return group3; }
     };
 
     namespace tt

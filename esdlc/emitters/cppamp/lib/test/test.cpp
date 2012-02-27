@@ -12,10 +12,13 @@ void test_real_generators_fixed();
 void test_int_generators_fixed();
 void test_bin_generators_fixed();
 
+void test_clamp();
+
 void test_mutate_random_real();
 void test_mutate_random_int();
 
 void test_mutate_bitflip();
+void test_mutate_inversion();
 
 void test_mutate_delta_real();
 void test_mutate_delta_int();
@@ -44,6 +47,7 @@ void test_crossover_tuple_2();
 void test_crossover_tuple_3();
 void test_best_of_tuple_2();
 void test_best_of_tuple_3();
+void test_from_tuple();
 
 
 
@@ -73,10 +77,13 @@ int wmain(int argc, wchar_t* argv[]) {
         test_int_generators_fixed();
         test_bin_generators_fixed();
 
+        test_clamp();
+
         test_mutate_random_real();
         test_mutate_random_int();
 
         test_mutate_bitflip();
+        test_mutate_inversion();
 
         test_mutate_delta_real();
         test_mutate_delta_int();
@@ -106,6 +113,7 @@ int wmain(int argc, wchar_t* argv[]) {
         test_crossover_tuple_3();
         test_best_of_tuple_2();
         test_best_of_tuple_3();
+        test_from_tuple();
     }
 
     CvReleaseMarkerSeries(_series);

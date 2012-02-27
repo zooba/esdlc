@@ -90,13 +90,16 @@
     <ClInclude Include="joiners\random_tuples.h" />
     <ClInclude Include="joiners\tuples.h" />
     <ClInclude Include="operators\best_of_tuple.h" />
+    <ClInclude Include="operators\clamp.h" />
     <ClInclude Include="operators\crossover.h" />
     <ClInclude Include="operators\crossover_average.h" />
     <ClInclude Include="operators\crossover_tuple.h" />
+    <ClInclude Include="operators\from_tuple.h" />
     <ClInclude Include="operators\merge.h" />
     <ClInclude Include="operators\mutate_bitflip.h" />
     <ClInclude Include="operators\mutate_delta.h" />
     <ClInclude Include="operators\mutate_gaussian.h" />
+    <ClInclude Include="operators\mutate_inversion.h" />
     <ClInclude Include="operators\mutate_random.h" />
     <ClInclude Include="filters\unique.h" />
     <ClInclude Include="output.h" />
@@ -104,6 +107,8 @@
     <ClInclude Include="selectors\best.h" />
     <ClInclude Include="selectors\fitness_proportional.h" />
     <ClInclude Include="selectors\fitness_sus.h" />
+    <ClInclude Include="selectors\rank_proportional.h" />
+    <ClInclude Include="selectors\rank_sus.h" />
     <ClInclude Include="selectors\repeated.h" />
     <ClInclude Include="selectors\tournament.h" />
     <ClInclude Include="selectors\uniform_random.h" />

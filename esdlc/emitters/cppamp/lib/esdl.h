@@ -59,12 +59,17 @@ using concurrency::parallel_for_each;
 
 #include "operators\merge.h"
 
+#include "operators\clamp.h"
+// ESDL operator: clamp(lowest=0, highest=0)
+
 #include "operators\mutate_random.h"
 #include "operators\mutate_bitflip.h"
+#include "operators\mutate_inversion.h"
 #include "operators\mutate_delta.h"
 #include "operators\mutate_gaussian.h"
 // ESDL operator: mutate_random(per_indiv_rate=(float)1, per_gene_rate=(float)0.1, genes=(int)0)
 // ESDL operator: mutate_bitflip(per_indiv_rate=(float)1, per_gene_rate=(float)0.1, genes=(int)0)
+// ESDL operator: mutate_inversion(per_indiv_rate=(float)1)
 // ESDL operator: mutate_delta(step_size=(float)1, positive_rate=(float)0.5, per_indiv_rate=(float)1, per_gene_rate=(float)1, genes=(int)0)
 // ESDL operator: mutate_gaussian(mean=(float)0, sigma=(float)0.5, per_indiv_rate=(float)1, per_gene_rate=(float)1, genes=(int)0)
 
@@ -83,8 +88,10 @@ using concurrency::parallel_for_each;
 // ESDL joiner: tuples()
 // ESDL joiner: random_tuples(distinct=<bool>false)
 
+#include "operators\from_tuple.h"
 #include "operators\best_of_tuple.h"
 #include "operators\crossover_tuple.h"
+// ESDL operator: from_tuple(index=<int>1)
 // ESDL operator: best_of_tuple()
 // ESDL operator: crossover_tuple(per_pair_rate=(float)1, per_gene_rate=(float)0.5)
 
@@ -95,6 +102,8 @@ using concurrency::parallel_for_each;
 #include "selectors\repeated.h"
 #include "selectors\fitness_proportional.h"
 #include "selectors\fitness_sus.h"
+#include "selectors\rank_proportional.h"
+#include "selectors\rank_sus.h"
 // ESDL operator: best()
 // ESDL operator: worst()
 // ESDL operator: tournament(k=(int)2, greediness=(float)1.0, with_replacement=<bool>true, without_replacement=<bool>false)
@@ -103,3 +112,5 @@ using concurrency::parallel_for_each;
 // ESDL operator: repeated()
 // ESDL operator: fitness_proportional(offset=nullptr, with_replacement=<bool>true, without_replacement=<bool>false)
 // ESDL operator: fitness_sus(offset=nullptr, mu=(int)0)
+// ESDL operator: rank_proportional(expectation=(float)1.1f, invert=(bool)false, with_replacement=<bool>true, without_replacement=<bool>false)
+// ESDL operator: rank_sus(expectation=(float)1.1f, mu=(int)0)

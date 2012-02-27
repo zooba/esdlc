@@ -88,11 +88,15 @@
     <ClCompile Include="tests\bin_generators.cpp" />
     <ClCompile Include="tests\best.cpp" />
     <ClCompile Include="tests\best_of_tuple.cpp" />
+    <ClCompile Include="tests\clamp.cpp" />
     <ClCompile Include="tests\crossover.cpp" />
     <ClCompile Include="tests\crossover_average.cpp" />
     <ClCompile Include="tests\crossover_tuple.cpp" />
     <ClCompile Include="tests\fitness_proportional.cpp" />
     <ClCompile Include="tests\fitness_sus.cpp" />
+    <ClCompile Include="tests\rank_proportional.cpp" />
+    <ClCompile Include="tests\rank_sus.cpp" />
+    <ClCompile Include="tests\from_tuple.cpp" />
     <ClCompile Include="tests\mutate_bitflip.cpp" />
     <ClCompile Include="tests\tournament.cpp" />
     <ClCompile Include="tests\uniform_shuffle.cpp" />
@@ -105,6 +109,7 @@
     <ClCompile Include="tests\int_generators.cpp" />
     <ClCompile Include="tests\mutate_delta.cpp" />
     <ClCompile Include="tests\mutate_gaussian.cpp" />
+    <ClCompile Include="tests\mutate_inversion.cpp" />
     <ClCompile Include="tests\mutate_random.cpp" />
     <ClCompile Include="tests\random.cpp" />
     <ClCompile Include="tests\real_generators.cpp" />
