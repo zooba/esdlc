@@ -34,10 +34,6 @@ namespace esdl
 
         int size() const { return group1 ? group1.size() : 0; }
         void reset() { group1.reset(); group2.reset(); evaluated = false; }
-
-        template<int Index> void get() { }
-        template<> G0& get<1>() { return group1; }
-        template<> G1& get<2>() { return group2; }
     };
 
     template<typename G0, typename G1, typename G2>
@@ -64,11 +60,6 @@ namespace esdl
 
         int size() const { return group1 ? group1.size() : 0; }
         void reset() { group1.reset(); group2.reset(); group3.reset(); evaluated = false; }
-
-        template<int Index> void get() { }
-        template<> G0& get<1>() { return group1; }
-        template<> G1& get<2>() { return group2; }
-        template<> G2& get<3>() { return group3; }
     };
 
     namespace tt
@@ -98,5 +89,30 @@ namespace esdl
             struct joined_group_type<esdl::joinedgroup<JoinCount, G0, G1, G2, G3, G4>, 3> { typedef G3 type; };
         template<int JoinCount, typename G0, typename G1, typename G2, typename G3, typename G4>
             struct joined_group_type<esdl::joinedgroup<JoinCount, G0, G1, G2, G3, G4>, 4> { typedef G4 type; };
+
+        template<int Index>
+            struct joined_group_get {
+                template<typename T> static void get(T& source) { static_assert(false, "Only indices 0-4 are currently supported."); } 
+            };
+        template<>
+            struct joined_group_get<0> {
+                template<typename T> static typename joined_group_type<T, 0>::type& get(T& source) { return source.group1; } 
+            };
+        template<>
+            struct joined_group_get<1> {
+                template<typename T> static typename joined_group_type<T, 1>::type& get(T& source) { return source.group2; } 
+            };
+        template<>
+            struct joined_group_get<2> {
+                template<typename T> static typename joined_group_type<T, 2>::type& get(T& source) { return source.group3; } 
+            };
+        template<>
+            struct joined_group_get<3> {
+                template<typename T> static typename joined_group_type<T, 3>::type& get(T& source) { return source.group4; } 
+            };
+        template<>
+            struct joined_group_get<4> {
+                template<typename T> static typename joined_group_type<T, 4>::type& get(T& source) { return source.group5; } 
+            };
     }
 }

@@ -23,16 +23,16 @@ void test_from_tuple_2() {
     typedef esdl::tt::individual_type<decltype(s1)>::type Indiv1;
     typedef esdl::tt::individual_type<decltype(s2)>::type Indiv2;
 
-    auto g1 = from_tuple(esdl::merge(tuples(esdl::merge(s1), esdl::merge(s2))()), std::integral_constant<int, 1>)();
-    static_assert(std::is_same<typename esdl::tt::individual_type<decltype(g1)>::type, Indiv1>::value)
+    auto g1 = from_tuple(esdl::merge(tuples(esdl::merge(s1), esdl::merge(s2))()), std::integral_constant<int, 1>())();
+    static_assert(std::is_same<typename esdl::tt::individual_type<decltype(g1)>::type, Indiv1>::value, "Mismatched types");
     _assert(g1.size() == 10);
     auto g1l = g1.as_list();
     assert_all(g1l, [](const Indiv1& indiv) { 
         return std::all_of(std::begin(indiv.genome), std::end(indiv.genome), [](float x) { return x == -1.0f; });
     });
 
-    auto g2 = from_tuple(esdl::merge(tuples(esdl::merge(s1), esdl::merge(s2))()), std::integral_constant<int, 2>)();
-    static_assert(std::is_same<typename esdl::tt::individual_type<decltype(g2)>::type, Indiv2>::value)
+    auto g2 = from_tuple(esdl::merge(tuples(esdl::merge(s1), esdl::merge(s2))()), std::integral_constant<int, 2>())();
+    static_assert(std::is_same<typename esdl::tt::individual_type<decltype(g2)>::type, Indiv2>::value, "Mismatched types");
     _assert(g2.size() == 10);
     auto g2l = g2.as_list();
     assert_all(g2l, [](const Indiv2& indiv) { 
@@ -52,24 +52,24 @@ void test_from_tuple_3() {
     typedef esdl::tt::individual_type<decltype(s2)>::type Indiv2;
     typedef esdl::tt::individual_type<decltype(s3)>::type Indiv3;
 
-    auto g1 = from_tuple(esdl::merge(tuples(esdl::merge(s1), esdl::merge(s2), esdl::merge(s3))()), std::integral_constant<int, 1>)();
-    static_assert(std::is_same<typename esdl::tt::individual_type<decltype(g1)>::type, Indiv1>::value)
+    auto g1 = from_tuple(esdl::merge(tuples(esdl::merge(s1), esdl::merge(s2), esdl::merge(s3))()), std::integral_constant<int, 1>())();
+    static_assert(std::is_same<typename esdl::tt::individual_type<decltype(g1)>::type, Indiv1>::value, "Mismatched types");
     _assert(g1.size() == 10);
     auto g1l = g1.as_list();
     assert_all(g1l, [](const Indiv1& indiv) { 
         return std::all_of(std::begin(indiv.genome), std::end(indiv.genome), [](float x) { return x == -1.0f; });
     });
 
-    auto g2 = from_tuple(esdl::merge(tuples(esdl::merge(s1), esdl::merge(s2), esdl::merge(s3))()), std::integral_constant<int, 2>)();
-    static_assert(std::is_same<typename esdl::tt::individual_type<decltype(g2)>::type, Indiv2>::value)
+    auto g2 = from_tuple(esdl::merge(tuples(esdl::merge(s1), esdl::merge(s2), esdl::merge(s3))()), std::integral_constant<int, 2>())();
+    static_assert(std::is_same<typename esdl::tt::individual_type<decltype(g2)>::type, Indiv2>::value, "Mismatched types");
     _assert(g2.size() == 10);
     auto g2l = g2.as_list();
     assert_all(g2l, [](const Indiv2& indiv) { 
         return std::all_of(std::begin(indiv.genome), std::end(indiv.genome), [](int x) { return x == -100; });
     });
 
-    auto g3 = from_tuple(esdl::merge(tuples(esdl::merge(s1), esdl::merge(s2), esdl::merge(s3))()), std::integral_constant<int, 3>)();
-    static_assert(std::is_same<typename esdl::tt::individual_type<decltype(g3)>::type, Indiv3>::value)
+    auto g3 = from_tuple(esdl::merge(tuples(esdl::merge(s1), esdl::merge(s2), esdl::merge(s3))()), std::integral_constant<int, 3>())();
+    static_assert(std::is_same<typename esdl::tt::individual_type<decltype(g3)>::type, Indiv3>::value, "Mismatched types");
     _assert(g3.size() == 10);
     auto g3l = g3.as_list();
     assert_all(g3l, [](const Indiv3& indiv) { 
@@ -79,4 +79,9 @@ void test_from_tuple_3() {
     test_pass();
 }
 
+
+void test_from_tuple() {
+    test_from_tuple_2();
+    test_from_tuple_3();
+}
 

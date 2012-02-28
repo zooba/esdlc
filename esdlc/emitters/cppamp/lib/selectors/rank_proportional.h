@@ -25,7 +25,7 @@ public:
         auto& keys = *indices;
 
         const int _length = keys.extent.size();
-        const float _scale = expectation - 2.0f * (expectation - 1) / (_length - 1.0f)
+        const float _scale = expectation - 2.0f * (expectation - 1) / (_length - 1.0f);
         total = expectation * _length - _scale * (_length * (_length + 1)) * 0.5f;
         if (!invert) {
             parallel_for_each(keys.accelerator_view, keys.grid, [=, &keys](index<1> i) restrict(direct3d) {

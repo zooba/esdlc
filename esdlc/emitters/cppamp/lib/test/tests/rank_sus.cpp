@@ -22,18 +22,11 @@ void test_single_rank_sus() {
 
     auto g1l = g1.as_vector();
 
-    auto g2 = rank_sus(esdl::merge(g1), nullptr, 100)(100);
+    auto g2 = rank_sus(esdl::merge(g1), 1.1f, 100)(100);
     auto g2l = g2.as_vector();
 
     assert_all(g2l, [](const Indiv& x) { return x.lowest == 0.0 && x.highest == 10.0; });
     _assert(g2l.size() == 100);
-
-    auto g3 = worst(esdl::merge(g1))(1);
-    auto g4 = rank_sus(esdl::merge(g1), g3, 100)(100);
-    auto g4l = g4.as_vector();
-
-    assert_all(g4l, [](const Indiv& x) { return x.lowest == 0.0 && x.highest == 10.0; });
-    _assert(g4l.size() == 100);
 
     test_pass();
 }
@@ -50,7 +43,7 @@ void test_repeated_rank_sus() {
     double distribution[100] = {0};
 
     for (int i = 0; i < 100; ++i) {
-        auto g2 = rank_sus(esdl::merge(g1), nullptr, 100)(100);
+        auto g2 = rank_sus(esdl::merge(g1), 1.1f, 100)(100);
         auto g2l = g2.as_vector();
 
         for (int j = 0; j < 100; ++j) {

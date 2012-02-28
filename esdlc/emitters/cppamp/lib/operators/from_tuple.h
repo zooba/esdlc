@@ -14,12 +14,12 @@ public:
 
     GroupType operator()() {
         auto src = source();
-        return src.get<Index>();
+        return esdl::tt::joined_group_get<Index-1>::get(src);
     }
 
     GroupType operator()(int count) {
         auto src = source(count);
-        return src.get<Index>();
+        return esdl::tt::joined_group_get<Index-1>::get(src);
     }
 };
 

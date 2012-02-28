@@ -21,7 +21,7 @@ void test_clamp_real() {
 
     auto g1l = g1.as_vector();
 
-    auto g2 = clamp(esdl::merge(g1), 0, 0)();
+    auto g2 = clamp(esdl::merge(g1), 0.0f, 0.0f)();
     auto g2l = g2.as_vector();
     assert_all(g2l, [](const Indiv& x) { return x.lowest == 0.0 && x.highest == 1.0; });
     assert_all(g2l, [](const Indiv& x) { return std::all_of(begin(x.genome), end(x.genome), [](float i) { return 0.0 <= i && i <= 1.0; }); });
@@ -30,7 +30,7 @@ void test_clamp_real() {
     g2 = clamp(esdl::merge(g1), 0.45f, 0.55f)();
     g2l = g2;
     assert_all(g2l, [](const Indiv& x) { return x.lowest == 0.0 && x.highest == 1.0; });
-    assert_all(g2l, [](const Indiv& x) { return std::all_of(begin(x.genome), end(x.genome), [](float i) { return 0.45 <= i && i <= 0.55; }); });
+    assert_all(g2l, [](const Indiv& x) { return std::all_of(begin(x.genome), end(x.genome), [](float i) { return 0.45f <= i && i <= 0.55f; }); });
 
     test_pass();
 }
@@ -43,7 +43,7 @@ void test_clamp_int() {
 
     auto g1l = g1.as_vector();
 
-    auto g2 = clamp(esdl::merge(g1), 1.0f, 0.5f, 0)();
+    auto g2 = clamp(esdl::merge(g1), 0, 0)();
     auto g2l = g2.as_vector();
     assert_all(g2l, [](const Indiv& x) { return x.lowest == -100 && x.highest == 100; });
     assert_all(g2l, [](const Indiv& x) { return std::all_of(begin(x.genome), end(x.genome), [](int i) { return -100 <= i && i <= 100; }); });
@@ -55,4 +55,9 @@ void test_clamp_int() {
     assert_all(g2l, [](const Indiv& x) { return std::all_of(begin(x.genome), end(x.genome), [](int i) { return -5 <= i && i <= 5; }); });
 
     test_pass();
+}
+
+void test_clamp() {
+    test_clamp_real();
+    test_clamp_int();
 }
