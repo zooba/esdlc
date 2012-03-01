@@ -79,7 +79,7 @@ public:
                 for (int j = 1; j < _k; ++j) {
                     int competitor = (int)(rand(i[0], j) * _size);
                     
-                    if (src[competitor].fitness > result[i].fitness) {
+                    if (src[competitor] > result[i]) {
                         result[i] = src[competitor];
                     }
                 }
