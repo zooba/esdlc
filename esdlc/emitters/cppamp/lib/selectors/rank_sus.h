@@ -27,7 +27,7 @@ public:
         
         const int _length = keys.extent.size();
         const float _scale = expectation - 2.0f * (expectation - 1) / (_length - 1.0f);
-        parallel_for_each(keys.accelerator_view, keys.grid, [=, &keys](index<1> i) restrict(direct3d) {
+        parallel_for_each(keys.accelerator_view, keys.extent, [=, &keys](index<1> i) restrict(amp) {
             keys[i].k = expectation - _scale * i[0];
         });
         
@@ -62,7 +62,7 @@ public:
         auto& src = *pSource;
         auto& result = *pResult;
         concurrency::array<int, 1> indices(index_list.size(), std::begin(index_list), std::end(index_list), src.accelerator_view);
-        parallel_for_each(src.accelerator_view, result.grid, [&](index<1> i) restrict(direct3d) {
+        parallel_for_each(src.accelerator_view, result.extent, [&](index<1> i) restrict(amp) {
             result[i] = src[indices[i]];
         });
         pResult.evaluate_using(pSource);

@@ -17,7 +17,6 @@
 
 using concurrency::array_view;
 using concurrency::extent;
-using concurrency::grid;
 using concurrency::index;
 using concurrency::parallel_for_each;
 

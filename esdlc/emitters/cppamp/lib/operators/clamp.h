@@ -30,18 +30,20 @@ private:
         const auto _lowest = lowest;
         const auto _highest = highest;
 
-        parallel_for_each(dest.accelerator_view, grid<2>(extent<2>(count, length)),
-            [=, &dest](index<2> i) restrict(direct3d) {
+        parallel_for_each(dest.accelerator_view, extent<2>(count, length),
+            [=, &dest](index<2> i) restrict(amp) {
             ElementType x = dest(i[0]).genome[i[1]];
             const auto _lowest2 = (_lowest < _highest) ? _lowest : dest(i[0]).lowest;
             const auto _highest2 = (_lowest < _highest) ? _highest : dest(i[0]).highest;
-            if (x < _lowest2) {
+            
+			dest(i[0]).genome[i[1]] = concurrency::direct3d::clamp(dest(i[0]).genome[i[1]], _lowest2, _highest2);
+			/*if (x < _lowest2) {
                 dest(i[0]).genome[i[1]] = _lowest2;
                 dest(i[0]).fitness = 0;
             } else if (x > _highest2) {
                 dest(i[0]).genome[i[1]] = _highest2;
                 dest(i[0]).fitness = 0;
-            }
+            }*/
         });
 
         return pDest;

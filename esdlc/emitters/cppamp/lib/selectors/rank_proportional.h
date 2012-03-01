@@ -28,11 +28,11 @@ public:
         const float _scale = expectation - 2.0f * (expectation - 1) / (_length - 1.0f);
         total = expectation * _length - _scale * (_length * (_length + 1)) * 0.5f;
         if (!invert) {
-            parallel_for_each(keys.accelerator_view, keys.grid, [=, &keys](index<1> i) restrict(direct3d) {
+            parallel_for_each(keys.accelerator_view, keys.extent, [=, &keys](index<1> i) restrict(amp) {
                 keys[i].k = expectation - _scale * i[0];
             });
         } else {
-            parallel_for_each(keys.accelerator_view, keys.grid, [=, &keys](index<1> i) restrict(direct3d) {
+            parallel_for_each(keys.accelerator_view, keys.extent, [=, &keys](index<1> i) restrict(amp) {
                 keys[i].k = expectation - _scale * (_length - i[0] - 1);
             });
         }
@@ -48,14 +48,14 @@ public:
         auto& src = *pSource;
         auto& result = *pResult;
 
-        parallel_for_each(keys.accelerator_view, keys.grid, [&](index<1> i) restrict(direct3d) {
+        parallel_for_each(keys.accelerator_view, keys.extent, [&](index<1> i) restrict(amp) {
             keys[i].k *= rand[i];
         });
 
         auto new_indices = esdl_sort::parallel_sort(keys);
         auto& new_keys = *new_indices;
 
-        parallel_for_each(result.accelerator_view, result.grid, [&](index<1> i) restrict(direct3d) {
+        parallel_for_each(result.accelerator_view, result.extent, [&](index<1> i) restrict(amp) {
             result[i] = src[new_keys[i].i];
         });
 
@@ -74,7 +74,7 @@ public:
 
         const float _total = total;
 
-        parallel_for_each(src.accelerator_view, result.grid, [&, _total](index<1> i) restrict(direct3d) {
+        parallel_for_each(src.accelerator_view, result.extent, [&, _total](index<1> i) restrict(amp) {
             float p = rand[i] * _total;
             for (unsigned int j = 0; p > 0 && j < rand.extent.size(); ++j) {
                 p -= keys[j].k;

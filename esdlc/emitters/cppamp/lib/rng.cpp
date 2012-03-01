@@ -3,10 +3,12 @@
 #include "utility.h"
 #include "rng.h"
 #include <amp.h>
+#include <amp_math.h>
 #include <cvmarkers.h>
 #include <tuple>
 
 using namespace concurrency;
+using namespace concurrency::fast_math;
 
 namespace
 {
@@ -35,17 +37,17 @@ namespace
     std::shared_ptr<array<unsigned int, 2>> state;
     unsigned int cpuState[STATE_DEPTH];
 
-    unsigned int lcg_step(unsigned int& state, unsigned int a, unsigned int c) restrict(cpu, direct3d) {  
+    unsigned int lcg_step(unsigned int& state, unsigned int a, unsigned int c) restrict(cpu, amp) {  
         return state = (a * state + c);  
     }
 
-    unsigned int tausworthe_step(unsigned int& state, unsigned int s1, unsigned int s2, unsigned int s3, unsigned int m) restrict(cpu, direct3d) {
+    unsigned int tausworthe_step(unsigned int& state, unsigned int s1, unsigned int s2, unsigned int s3, unsigned int m) restrict(cpu, amp) {
         unsigned int b = (((state * s1) ^ state) / s2);  
         return state = (((state & m) * s3) ^ b);  
     }
 
     template<typename State>
-    unsigned int next_uint(State state) restrict(cpu, direct3d) {
+    unsigned int next_uint(State state) restrict(cpu, amp) {
         return (tausworthe_step(state[0], 1 << 13, 1 << 19, 1 << 12, 4294967294UL) ^
             tausworthe_step(state[1], 1 << 2, 1 << 25, 1 << 4, 4294967288UL) ^
             tausworthe_step(state[2], 1 << 3, 1 << 11, 1 << 17, 4294967280UL) ^
@@ -54,38 +56,30 @@ namespace
     }
 
     template<typename State>
-    float next_float(State state) restrict(cpu, direct3d) {
+    float next_float(State state) restrict(cpu, amp) {
         return (float)(2.3283064365387e-10f * next_uint(state));
     }
 
     struct float2 {
         float f1;
         float f2;
-        float2(float f1, float f2) restrict(cpu, direct3d) : f1(f1), f2(f2) { }
+        float2(float f1, float f2) restrict(cpu, amp) : f1(f1), f2(f2) { }
     };
 
-    const float PI = 3.1415926535897932384626433832795f;
     template<typename State>
-    float2 next_normal(State state) restrict(cpu) {
+    float2 next_normal(State state) restrict(cpu, amp) {
+		const float PI = 3.1415926535897932384626433832795f;
         float u0 = next_float(state), u1 = next_float(state);
         float r = sqrt(-2 * log(u0));  
         float theta = 2 * PI * u1;
         return float2(r * sin(theta), r * cos(theta));
     }
 
-    template<typename State>
-    float2 next_normal(State state) restrict(direct3d) {
-        float u0 = next_float(state), u1 = next_float(state);
-        float r = sqrt(-2 * log(u0));  
-        float theta = 2 * u1;
-        return float2(r * sinpi(theta), r * cospi(theta));
-    }
-
     template<int Rank>
     void fill_array(array<float, Rank>& arr) {
         auto& _state = *state;
         const int count = (int)arr.extent.size();
-        parallel_for_each(arr.accelerator_view, grid<1>(extent<1>(STATE_WIDTH)), [=, &_state, &arr](index<1> i) restrict(direct3d) {
+        parallel_for_each(arr.accelerator_view, extent<1>(STATE_WIDTH), [=, &_state, &arr](index<1> i) restrict(amp) {
             for (int start = 0; start < count; start += STATE_WIDTH) {
                 if (i[0] + start < count) {
                     arr.data()[i[0] + start] = next_float(_state[i[0]]);
@@ -98,7 +92,7 @@ namespace
     void fill_normal_array(array<float, Rank>& arr) {
         auto& _state = *state;
         const int count = (int)arr.extent.size();
-        parallel_for_each(arr.accelerator_view, grid<1>(extent<1>(STATE_WIDTH)), [=, &_state, &arr](index<1> i) restrict(direct3d) {
+        parallel_for_each(arr.accelerator_view, extent<1>(STATE_WIDTH), [=, &_state, &arr](index<1> i) restrict(amp) {
             for (int start = 0; start < count; start += 2*STATE_WIDTH) {
                 float2 r = next_normal(_state[i[0]]);
                 if (i[0] + start < count) {

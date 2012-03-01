@@ -32,8 +32,8 @@ private:
         const float _per_gene_rate = (genes > 0) ? (float)genes / length : per_gene_rate;
         
         if (_per_indiv_rate >= 1.0f && _per_gene_rate >= 1.0f) {
-            parallel_for_each(src.accelerator_view, grid<2>(extent<2>(count, length)),
-                [=, &dest](index<2> i) restrict(direct3d) {
+            parallel_for_each(src.accelerator_view, extent<2>(count, length),
+                [=, &dest](index<2> i) restrict(amp) {
                     dest(i[0]).genome[i[1]] = (dest(i[0]).genome[i[1]] == 0) ? 1 : 0;
                     dest(i[0]).fitness = 0;
             });
@@ -41,8 +41,8 @@ private:
             auto _rand = random_array(count, length);
             auto& rand = *_rand;
 
-            parallel_for_each(src.accelerator_view, grid<2>(extent<2>(count, length)),
-                [=, &dest, &rand](index<2> i) restrict(direct3d) {
+            parallel_for_each(src.accelerator_view, extent<2>(count, length),
+                [=, &dest, &rand](index<2> i) restrict(amp) {
                     if (rand[i] < _per_gene_rate) {
                         dest(i[0]).genome[i[1]] = (dest(i[0]).genome[i[1]] == 0) ? 1 : 0;
                         dest(i[0]).fitness = 0;
@@ -52,8 +52,8 @@ private:
             auto _rand = random_array(count, length + 1);
             auto& rand = *_rand;
 
-            parallel_for_each(src.accelerator_view, grid<2>(extent<2>(count, length)),
-                [=, &dest, &rand](index<2> i) restrict(direct3d) {
+            parallel_for_each(src.accelerator_view, extent<2>(count, length),
+                [=, &dest, &rand](index<2> i) restrict(amp) {
                     if (rand(i[0], length) < _per_indiv_rate && (_per_gene_rate >= 1.0f || rand[i] < _per_gene_rate)) {
                         dest(i[0]).genome[i[1]] = (dest(i[0]).genome[i[1]] == 0) ? 1 : 0;
                         dest(i[0]).fitness = 0;

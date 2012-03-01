@@ -38,16 +38,16 @@ private:
         const float _per_gene_rate = (genes > 0) ? (float)genes / length : per_gene_rate;
 
         if (_per_pair_rate >= 1.0f && _per_gene_rate >= 1.0f) {
-            parallel_for_each(result.accelerator_view, grid<2>(extent<2>(count, length)),
-                [=, &result, &source](index<2> i) restrict(direct3d) {
+            parallel_for_each(result.accelerator_view, extent<2>(count, length),
+                [=, &result, &source](index<2> i) restrict(amp) {
                     result(i[0]).genome[i[1]] = (source(i[0] * 2).genome[i[1]] + source(i[0] * 2 + 1).genome[i[1]]) / 2;
             });
         } else if (_per_pair_rate >= 1.0f) {
             auto _rand = random_array(count, length);
             auto& rand = *_rand;
 
-            parallel_for_each(result.accelerator_view, grid<2>(extent<2>(count, length)),
-                [=, &result, &source](index<2> i) restrict(direct3d) {
+            parallel_for_each(result.accelerator_view, extent<2>(count, length),
+                [=, &result, &source, &rand](index<2> i) restrict(amp) {
                     if (rand[i] < _per_gene_rate) {
                         result(i[0]).genome[i[1]] = (source(i[0] * 2).genome[i[1]] + source(i[0] * 2 + 1).genome[i[1]]) / 2;
                     } else {
@@ -58,8 +58,8 @@ private:
             auto _rand = random_array(count, length + 1);
             auto& rand = *_rand;
             
-            parallel_for_each(result.accelerator_view, grid<2>(extent<2>(count, length)),
-                [=, &result, &source](index<2> i) restrict(direct3d) {
+            parallel_for_each(result.accelerator_view, extent<2>(count, length),
+                [=, &result, &source, &rand](index<2> i) restrict(amp) {
                     if (rand(i[0], length) < _per_pair_rate && (_per_gene_rate >= 1.0f || rand[i] < _per_gene_rate)) {
                         result(i[0]).genome[i[1]] = (source(i[0] * 2).genome[i[1]] + source(i[0] * 2 + 1).genome[i[1]]) / 2;
                     } else {

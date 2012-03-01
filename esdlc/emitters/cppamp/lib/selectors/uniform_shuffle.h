@@ -11,7 +11,7 @@ class uniform_shuffle_t
 {
     SourceType source;
     typedef typename esdl::tt::individual_type<SourceType>::type IndividualType;
-    struct _float { float f; operator float() restrict(cpu, direct3d) { return f; } };
+    struct _float { float f; operator float() restrict(cpu, amp) { return f; } };
 
 public:
 
@@ -30,7 +30,7 @@ public:
         auto _keys = esdl_sort::parallel_sort_keys(*reinterpret_cast<concurrency::array<_float, 1>*>(_rand.get()));
         auto& keys = *_keys;
 
-        parallel_for_each(src.accelerator_view, dest.grid, [&](index<1> i) restrict(direct3d) {
+        parallel_for_each(src.accelerator_view, dest.extent, [&](index<1> i) restrict(amp) {
             dest[i] = src[keys[i].i];
         });
 

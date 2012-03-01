@@ -24,8 +24,8 @@ public:
             auto& rand = *_rand;
 
             
-            parallel_for_each(group.accelerator_view, grid<2>(extent<2>(count, Length)),
-                [=, &group, &rand](index<2> i) restrict(direct3d) {
+            parallel_for_each(group.accelerator_view, extent<2>(count, Length),
+                [=, &group, &rand](index<2> i) restrict(amp) {
                     group(i[0]).genome[i[1]] = _lowest + rand[i] * (_highest - _lowest);
                     group(i[0]).fitness = 0;
                     group(i[0]).lowest = _lowest;
@@ -33,8 +33,8 @@ public:
             });
         } else {
             const float _init = init;
-            parallel_for_each(group.accelerator_view, grid<2>(extent<2>(count, Length)),
-                [=, &group](index<2> i) restrict(direct3d) {
+            parallel_for_each(group.accelerator_view, extent<2>(count, Length),
+                [=, &group](index<2> i) restrict(amp) {
                     group(i[0]).genome[i[1]] = _init;
                     group(i[0]).fitness = 0;
                     group(i[0]).lowest = _lowest;

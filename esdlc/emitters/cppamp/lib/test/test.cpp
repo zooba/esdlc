@@ -57,7 +57,7 @@ PCV_SPAN _span;
 
 void forceCppAmpLoad() {
     concurrency::array<int, 1> arr(100);
-    parallel_for_each(arr.grid, [&](index<1> i) restrict(direct3d) { arr[i] = i.x; });
+    parallel_for_each(arr.extent, [&](index<1> i) restrict(amp) { arr[i] = i[0]; });
 }
 
 int wmain(int argc, wchar_t* argv[]) {

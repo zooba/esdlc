@@ -10,14 +10,14 @@ namespace esdl_sort
         KeyType k;
         int i;
 
-        KeyIndex() restrict(cpu, direct3d) { }
-        KeyIndex(SourceType key, int index) restrict(cpu, direct3d) : k((KeyType)key), i(index) { }
+        KeyIndex() restrict(cpu, amp) { }
+        KeyIndex(SourceType key, int index) restrict(cpu, amp) : k((KeyType)key), i(index) { }
 
-        bool operator<(const KeyIndex<SourceType, KeyType>& other) const restrict(cpu, direct3d) {
+        bool operator<(const KeyIndex<SourceType, KeyType>& other) const restrict(cpu, amp) {
             return k < other.k;
         }
 
-        operator KeyType() const restrict(cpu, direct3d) {
+        operator KeyType() const restrict(cpu, amp) {
             return k;
         }
     };
@@ -38,8 +38,8 @@ namespace esdl_sort
             const int mask = block_size - 1;
             const int half_mask = half_block_size - 1;
             concurrency::parallel_for_each(dest.accelerator_view,
-                concurrency::grid<1>(concurrency::extent<1>(virtual_size / 2)),
-                [=, &dest](index<1> i) restrict(direct3d) {
+                concurrency::extent<1>(virtual_size / 2),
+                [=, &dest](index<1> i) restrict(amp) {
                 const int i1 = ((i[0] & ~half_mask) << 1) | (i[0] & half_mask);
                 const int i2 = (First) ? ((i1 | mask) - (i1 & mask)) : (i1 + half_block_size);
 
@@ -65,8 +65,8 @@ namespace esdl_sort
         typedef typename key_index_type<SourceType>::type Key;
         auto pKeys = std::make_shared<concurrency::array<Key, 1>>(actual_size, source.accelerator_view);
         auto& keys = *pKeys;
-        concurrency::parallel_for_each(keys.accelerator_view, keys.grid,
-            [=, &keys, &source](concurrency::index<1> i) restrict(direct3d) {
+        concurrency::parallel_for_each(keys.accelerator_view, keys.extent,
+            [=, &keys, &source](concurrency::index<1> i) restrict(amp) {
             keys[i] = Key(source[i], i[0]);
         });
 
@@ -120,13 +120,13 @@ namespace esdl_sort
         auto pResult = std::make_shared<concurrency::array<SourceType, 1>>(source.extent.size(), source.accelerator_view);
         auto& result = *pResult;
         if (!reverse) {
-            concurrency::parallel_for_each(result.accelerator_view, result.grid,
-                [&](concurrency::index<1> i) restrict(direct3d) {
+            concurrency::parallel_for_each(result.accelerator_view, result.extent,
+                [&](concurrency::index<1> i) restrict(amp) {
                 result[i] = source[keys[i].i];
             });
         } else {
-            concurrency::parallel_for_each(result.accelerator_view, result.grid,
-                [&](concurrency::index<1> i) restrict(direct3d) {
+            concurrency::parallel_for_each(result.accelerator_view, result.extent,
+                [&](concurrency::index<1> i) restrict(amp) {
                 result[i] = source[keys[keys.extent.size() - 1 - i].i];
             });
         }
@@ -144,8 +144,8 @@ namespace esdl_sort
         } else {
             auto pResult = std::make_shared<concurrency::array<SourceType, 1>>(source.extent.size(), source.accelerator_view);
             auto& result = *pResult;
-            concurrency::parallel_for_each(result.accelerator_view, result.grid,
-                [&](concurrency::index<1> i) restrict(direct3d) {
+            concurrency::parallel_for_each(result.accelerator_view, result.extent,
+                [&](concurrency::index<1> i) restrict(amp) {
                 result[i] = keys[keys.extent.size() - 1 - i];
             });
             return pResult;

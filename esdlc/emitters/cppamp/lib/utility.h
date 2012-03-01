@@ -25,7 +25,7 @@ namespace esdl
 
     template<typename GeneType> struct scale_value
     {
-        static GeneType scale(float value, GeneType highest, GeneType lowest) restrict(cpu, direct3d) {
+        static GeneType scale(float value, GeneType highest, GeneType lowest) restrict(cpu, amp) {
             return (GeneType)(value * (highest - lowest));
         }
     };

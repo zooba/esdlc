@@ -37,8 +37,8 @@ private:
         auto& rand2 = *_rand2;
 
         if (_per_indiv_rate >= 1.0f && _per_gene_rate >= 1.0f) {
-            parallel_for_each(dest.accelerator_view, grid<2>(extent<2>(count, length)),
-                [=, &dest, &rand2](index<2> i) restrict(direct3d) {
+            parallel_for_each(dest.accelerator_view, extent<2>(count, length),
+                [=, &dest, &rand2](index<2> i) restrict(amp) {
                     dest(i[0]).genome[i[1]] += (esdl::tt::element_type<IndividualType>::type)(rand2[i] * _sigma + _mean);
                     dest(i[0]).fitness = 0;
             });
@@ -46,8 +46,8 @@ private:
             auto _rand1 = random_array(count, length);
             auto& rand1 = *_rand1;
 
-            parallel_for_each(dest.accelerator_view, grid<2>(extent<2>(count, length)),
-                [=, &dest, &rand1, &rand2](index<2> i) restrict(direct3d) {
+            parallel_for_each(dest.accelerator_view, extent<2>(count, length),
+                [=, &dest, &rand1, &rand2](index<2> i) restrict(amp) {
                     if (rand1[i] < _per_gene_rate) {
                         dest(i[0]).genome[i[1]] += (esdl::tt::element_type<IndividualType>::type)(rand2[i] * _sigma + _mean);
                         dest(i[0]).fitness = 0;
@@ -58,8 +58,8 @@ private:
             auto _rand1 = random_array(count, length + 1);
             auto& rand1 = *_rand1;
 
-            parallel_for_each(dest.accelerator_view, grid<2>(extent<2>(count, length)),
-                [=, &dest, &rand1, &rand2](index<2> i) restrict(direct3d) {
+            parallel_for_each(dest.accelerator_view, extent<2>(count, length),
+                [=, &dest, &rand1, &rand2](index<2> i) restrict(amp) {
                     if (rand1(i[0], length) < _per_indiv_rate && (_per_gene_rate >= 1.0f || rand1[i] < _per_gene_rate)) {
                         dest(i[0]).genome[i[1]] += (esdl::tt::element_type<IndividualType>::type)(rand2[i] * _sigma + _mean);
                         dest(i[0]).fitness = 0;

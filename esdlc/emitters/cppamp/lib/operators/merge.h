@@ -51,7 +51,7 @@ namespace esdl
 
                 auto& src = *groups[upToGroup];
                 const int j = upToIndividual;
-                parallel_for_each(src.accelerator_view, grid<1>(extent<1>(len)), [&, i, j](index<1> k) restrict(direct3d) {
+                parallel_for_each(src.accelerator_view, extent<1>(len), [&, i, j](index<1> k) restrict(amp) {
                     dest[k+i] = src[k+j];
                 });
 
@@ -115,7 +115,7 @@ namespace esdl
 
                     auto pSrc = generator(len);
                     auto& src = *pSrc;
-                    parallel_for_each(src.accelerator_view, grid<1>(extent<1>(len)), [&, i](index<1> k) restrict(direct3d) {
+                    parallel_for_each(src.accelerator_view, extent<1>(len), [&, i](index<1> k) restrict(amp) {
                         dest[k+i] = src[k];
                     });
 
@@ -126,7 +126,7 @@ namespace esdl
 
                     auto& src = *groups[upToGroup];
                     const int j = upToIndividual;
-                    parallel_for_each(src.accelerator_view, grid<1>(extent<1>(len)), [&, i, j](index<1> k) restrict(direct3d) {
+                    parallel_for_each(src.accelerator_view, extent<1>(len), [&, i, j](index<1> k) restrict(amp) {
                         dest[k+i] = src[k+j];
                     });
 

@@ -79,7 +79,7 @@ public:
         auto& src = *pSource;
         auto& result = *pResult;
         concurrency::array<int, 1> indices(index_list.size(), std::begin(index_list), std::end(index_list), src.accelerator_view);
-        parallel_for_each(src.accelerator_view, result.grid, [&](index<1> i) restrict(direct3d) {
+        parallel_for_each(src.accelerator_view, result.extent, [&](index<1> i) restrict(amp) {
             result[i] = src[indices[i]];
         });
         pResult.evaluate_using(pSource);

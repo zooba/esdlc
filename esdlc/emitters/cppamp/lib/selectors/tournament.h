@@ -69,21 +69,21 @@ public:
 
         const int _k = k;
         const float _greediness = greediness;
+        const float _size = (float)pSource.size();
 
-        parallel_for_each(result.accelerator_view, result.grid, [&, _k, _greediness](index<1> i) restrict(direct3d) {
-            int winner = (int)(rand(i[0], 0) * src.extent.size());
+        parallel_for_each(result.accelerator_view, result.extent, [&, _k, _greediness, _size](index<1> i) restrict(amp) {
+            int winner = (int)(rand(i[0], 0) * _size);
+            result[i] = src[winner];
 
             if (rand(i[0], _k) < _greediness) {
                 for (int j = 1; j < _k; ++j) {
-                    int competitor = (int)(rand(i[0], j) * src.extent.size());
+                    int competitor = (int)(rand(i[0], j) * _size);
                     
-                    if (src(competitor) > src(winner)) {
-                        winner = competitor;
+                    if (src[competitor].fitness > result[i].fitness) {
+                        result[i] = src[competitor];
                     }
                 }
             }
-
-            result(i[0]) = src(winner);
         });
 
         pResult.evaluate_using(pSource);

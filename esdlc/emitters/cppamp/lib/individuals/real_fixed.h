@@ -9,7 +9,7 @@ struct real_fixed_individual : esdl::fixed_individual<float, Length> {
     real_fixed_individual() { }
     real_fixed_individual(float lowest, float highest) : lowest(lowest), highest(highest) { }
 
-    void operator=(const real_fixed_individual<Length>& other) restrict(cpu, direct3d)
+    void operator=(const real_fixed_individual<Length>& other) restrict(cpu, amp)
     {
         for (int i = 0; i < Length; ++i) {
             genome[i] = other.genome[i];

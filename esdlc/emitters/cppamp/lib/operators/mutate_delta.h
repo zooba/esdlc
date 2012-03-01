@@ -37,8 +37,8 @@ private:
         auto _rand = random_array(count, length + 1, 2);
         auto& rand = *_rand;
 
-        parallel_for_each(dest.accelerator_view, grid<2>(extent<2>(count, length)),
-            [=, &dest, &rand](index<2> i) restrict(direct3d) {
+        parallel_for_each(dest.accelerator_view, extent<2>(count, length),
+            [=, &dest, &rand](index<2> i) restrict(amp) {
                 index<3> i_i(i[0], length, 0), i_g(i[0], i[1], 0), i_p(i[0], i[1], 1);
                 
                 if (rand[i_i] < _per_indiv_rate && rand[i_g] < _per_gene_rate) {

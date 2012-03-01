@@ -43,10 +43,10 @@ public:
         auto& keys = *indices;
 
         concurrency::array<float, 1> offset(keys.extent, keys.accelerator_view);
-        parallel_for_each(keys.accelerator_view, keys.grid, [&](index<1> i) restrict(direct3d) {
+        parallel_for_each(keys.accelerator_view, keys.extent, [&](index<1> i) restrict(amp) {
             offset[i] = keys[keys.extent.size() - 1].k;
         });
-        parallel_for_each(keys.accelerator_view, keys.grid, [&](index<1> i) restrict(direct3d) {
+        parallel_for_each(keys.accelerator_view, keys.extent, [&](index<1> i) restrict(amp) {
             keys[i].k -= offset[i];
         });
 
@@ -58,7 +58,7 @@ public:
         indices = esdl_sort::parallel_sort_keys(*pSource);
         auto& keys = *indices;
         
-        parallel_for_each(keys.accelerator_view, keys.grid, [&](index<1> i) restrict(direct3d) {
+        parallel_for_each(keys.accelerator_view, keys.extent, [&](index<1> i) restrict(amp) {
             keys[i].k -= offset[0].fitness;
         });
 
@@ -75,14 +75,14 @@ public:
         auto& src = *pSource;
         auto& result = *pResult;
 
-        parallel_for_each(keys.accelerator_view, keys.grid, [&](index<1> i) restrict(direct3d) {
+        parallel_for_each(keys.accelerator_view, keys.extent, [&](index<1> i) restrict(amp) {
             keys[i].k *= rand[i];
         });
 
         auto new_indices = esdl_sort::parallel_sort(keys);
         auto& new_keys = *new_indices;
 
-        parallel_for_each(result.accelerator_view, result.grid, [&](index<1> i) restrict(direct3d) {
+        parallel_for_each(result.accelerator_view, result.extent, [&](index<1> i) restrict(amp) {
             result[i] = src[new_keys[i].i];
         });
 
@@ -102,7 +102,7 @@ public:
         init_total_fitness();
         const float _total = total_fitness;
 
-        parallel_for_each(src.accelerator_view, result.grid, [&, _total](index<1> i) restrict(direct3d) {
+        parallel_for_each(src.accelerator_view, result.extent, [&, _total](index<1> i) restrict(amp) {
             float p = rand[i] * _total;
             for (unsigned int j = 0; p > 0 && j < rand.extent.size(); ++j) {
                 p -= keys[j].k;

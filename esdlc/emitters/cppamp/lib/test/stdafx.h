@@ -24,7 +24,6 @@
 
 using concurrency::array_view;
 using concurrency::extent;
-using concurrency::grid;
 using concurrency::index;
 using concurrency::parallel_for_each;
 
@@ -82,7 +81,7 @@ struct TestEvaluator {
     template<typename IndividualType>
     void operator()(esdl::group<IndividualType> group) const {
         auto& g = *group;
-        concurrency::parallel_for_each(g.grid, [&](index<1> i) restrict(direct3d) {
+        concurrency::parallel_for_each(g.extent, [&](index<1> i) restrict(amp) {
             g[i].fitness = 0;
             for (int j = 0; j < 10; ++j) {
                 g[i].fitness += g[i].genome[j];

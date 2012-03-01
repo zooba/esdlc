@@ -24,7 +24,7 @@ public:
         auto& rand = *_rand;
         const int size = pSource.size();
 
-        parallel_for_each(src.accelerator_view, dest.grid, [&, size](index<1> i) restrict(direct3d) {
+        parallel_for_each(src.accelerator_view, dest.extent, [&, size](index<1> i) restrict(amp) {
             dest[i] = src[(int)(rand[i] * size)];
         });
 

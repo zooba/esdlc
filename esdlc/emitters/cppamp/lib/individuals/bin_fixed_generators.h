@@ -16,14 +16,14 @@ public:
 
         const float _rate = true_rate;
         if (_rate <= 0.0f) {
-            parallel_for_each(group.accelerator_view, grid<2>(extent<2>(count, Length)),
-                [&](index<2> i) restrict(direct3d) {
+            parallel_for_each(group.accelerator_view, extent<2>(count, Length),
+                [&](index<2> i) restrict(amp) {
                     group(i[0]).genome[i[1]] = 0;
                     group(i[0]).fitness = 0;
             });
         } else if (_rate >= 1.0f) {
-            parallel_for_each(group.accelerator_view, grid<2>(extent<2>(count, Length)),
-                [&](index<2> i) restrict(direct3d) {
+            parallel_for_each(group.accelerator_view, extent<2>(count, Length),
+                [&](index<2> i) restrict(amp) {
                     group(i[0]).genome[i[1]] = 1;
                     group(i[0]).fitness = 0;
             });
@@ -31,8 +31,8 @@ public:
             auto _rand = random_array(count, Length);
             auto& rand = *_rand;
             
-            parallel_for_each(group.accelerator_view, grid<2>(extent<2>(count, Length)),
-                [&, _rate](index<2> i) restrict(direct3d) {
+            parallel_for_each(group.accelerator_view, extent<2>(count, Length),
+                [&, _rate](index<2> i) restrict(amp) {
                     group(i[0]).genome[i[1]] = (rand[i] < _rate) ? 1 : 0;
                     group(i[0]).fitness = 0;
             });

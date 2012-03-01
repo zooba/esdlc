@@ -40,8 +40,8 @@ private:
             auto _rand = random_array(count, points);
             auto& rand = *_rand;
             
-            parallel_for_each(result.accelerator_view, grid<2>(extent<2>(count, length)),
-                [&, length](index<2> i) restrict(direct3d) {
+            parallel_for_each(result.accelerator_view, extent<2>(count, length),
+                [&, length](index<2> i) restrict(amp) {
                     int crosses = 0;
                     for (int j = 0; j < points; ++j) {
                         if (i[1] >= (int)(rand(i[0], j) * length)) {
@@ -54,7 +54,7 @@ private:
         } else {
             pResult = esdl::make_group<IndividualType>(count * 2);
             auto& result = *pResult;
-            parallel_for_each(result.accelerator_view, result.grid, [&](index<1> i) restrict(direct3d) {
+            parallel_for_each(result.accelerator_view, result.extent, [&](index<1> i) restrict(amp) {
                 result[i] = source[i];
             });
 
@@ -62,8 +62,8 @@ private:
                 auto _rand = random_array(count);
                 auto& rand = *_rand;
 
-                parallel_for_each(result.accelerator_view, grid<2>(extent<2>(count, length)),
-                    [&, length](index<2> i) restrict(direct3d) {
+                parallel_for_each(result.accelerator_view, extent<2>(count, length),
+                    [&, length](index<2> i) restrict(amp) {
                         if (i[1] >= (int)(rand(i[0]) * length)) {
                             auto temp = result(i[0] * 2).genome[i[1]];
                             result(i[0] * 2).genome[i[1]] = result(i[0] * 2 + 1).genome[i[1]];

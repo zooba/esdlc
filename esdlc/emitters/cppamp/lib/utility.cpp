@@ -3,7 +3,7 @@
 #include <iostream>
 
 namespace { concurrency::accelerator _acc(concurrency::accelerator::default_accelerator); }
-concurrency::accelerator_view esdl::acc = _acc.create_view(concurrency::queuing_mode::deferred);
+concurrency::accelerator_view esdl::acc = _acc.create_view(concurrency::queuing_mode_automatic);
 
 
 #include <Windows.h>

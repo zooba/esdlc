@@ -14,7 +14,7 @@ namespace esdl
         ElementType genome[Length];
         float fitness;
 
-        void operator=(const fixed_individual<ElementType, Length>& other) restrict(cpu, direct3d)
+        void operator=(const fixed_individual<ElementType, Length>& other) restrict(cpu, amp)
         {
             for (int i = 0; i < Length; ++i) {
                 genome[i] = other.genome[i];
@@ -29,7 +29,7 @@ namespace esdl
         float fitness;
         int length;
 
-        variable_individual<ElementType, Shortest, Longest>& operator=(const variable_individual<ElementType, Shortest, Longest>& other) restrict(direct3d)
+        variable_individual<ElementType, Shortest, Longest>& operator=(const variable_individual<ElementType, Shortest, Longest>& other) restrict(amp)
         {
             for (int i = 0; i < length; ++i) {
                 genome[i] = other.genome[i];
@@ -102,74 +102,74 @@ namespace esdl
 template<typename ElementType, int Length1, int Length2>
 bool operator ==(
     const esdl::fixed_individual<ElementType, Length1>& a,
-    const esdl::fixed_individual<ElementType, Length2>& b) restrict(cpu, direct3d) {
+    const esdl::fixed_individual<ElementType, Length2>& b) restrict(cpu, amp) {
     return a.fitness == b.fitness;
 }
 template<typename ElementType, int Length1, int Length2>
 bool operator !=(
     const esdl::fixed_individual<ElementType, Length1>& a,
-    const esdl::fixed_individual<ElementType, Length2>& b) restrict(cpu, direct3d) {
+    const esdl::fixed_individual<ElementType, Length2>& b) restrict(cpu, amp) {
     return !(a.fitness == b.fitness);
 }
 template<typename ElementType, int Length1, int Length2>
 bool operator <(
     const esdl::fixed_individual<ElementType, Length1>& a,
-    const esdl::fixed_individual<ElementType, Length2>& b) restrict(cpu, direct3d) {
+    const esdl::fixed_individual<ElementType, Length2>& b) restrict(cpu, amp) {
     return a.fitness < b.fitness;
 }
 template<typename ElementType, int Length1, int Length2>
 bool operator <=(
     const esdl::fixed_individual<ElementType, Length1>& a,
-    const esdl::fixed_individual<ElementType, Length2>& b) restrict(cpu, direct3d) {
+    const esdl::fixed_individual<ElementType, Length2>& b) restrict(cpu, amp) {
     return a.fitness < b.fitness || a.fitness == b.fitness;
 }
 template<typename ElementType, int Length1, int Length2>
 bool operator >=(
     const esdl::fixed_individual<ElementType, Length1>& a,
-    const esdl::fixed_individual<ElementType, Length2>& b) restrict(cpu, direct3d) {
+    const esdl::fixed_individual<ElementType, Length2>& b) restrict(cpu, amp) {
     return !(a.fitness < b.fitness);
 }
 template<typename ElementType, int Length1, int Length2>
 bool operator >(
     const esdl::fixed_individual<ElementType, Length1>& a,
-    const esdl::fixed_individual<ElementType, Length2>& b) restrict(cpu, direct3d) {
+    const esdl::fixed_individual<ElementType, Length2>& b) restrict(cpu, amp) {
     return !(a.fitness < b.fitness || a.fitness == b.fitness);
 }
 
 template<typename ElementType, int Shortest1, int Shortest2, int Longest1, int Longest2>
 bool operator ==(
     const esdl::variable_individual<ElementType, Shortest1, Longest1>& a,
-    const esdl::variable_individual<ElementType, Shortest2, Longest2>& b) restrict(cpu, direct3d) {
+    const esdl::variable_individual<ElementType, Shortest2, Longest2>& b) restrict(cpu, amp) {
     return a.fitness == b.fitness;
 }
 template<typename ElementType, int Shortest1, int Shortest2, int Longest1, int Longest2>
 bool operator !=(
     const esdl::variable_individual<ElementType, Shortest1, Longest1>& a,
-    const esdl::variable_individual<ElementType, Shortest2, Longest2>& b) restrict(cpu, direct3d) {
+    const esdl::variable_individual<ElementType, Shortest2, Longest2>& b) restrict(cpu, amp) {
     return !(a.fitness == b.fitness);
 }
 template<typename ElementType, int Shortest1, int Shortest2, int Longest1, int Longest2>
 bool operator <(
     const esdl::variable_individual<ElementType, Shortest1, Longest1>& a,
-    const esdl::variable_individual<ElementType, Shortest2, Longest2>& b) restrict(cpu, direct3d) {
+    const esdl::variable_individual<ElementType, Shortest2, Longest2>& b) restrict(cpu, amp) {
     return a.fitness < b.fitness;
 }
 template<typename ElementType, int Shortest1, int Shortest2, int Longest1, int Longest2>
 bool operator <=(
     const esdl::variable_individual<ElementType, Shortest1, Longest1>& a,
-    const esdl::variable_individual<ElementType, Shortest2, Longest2>& b) restrict(cpu, direct3d) {
+    const esdl::variable_individual<ElementType, Shortest2, Longest2>& b) restrict(cpu, amp) {
     return a.fitness < b.fitness || a.fitness == b.fitness;
 }
 template<typename ElementType, int Shortest1, int Shortest2, int Longest1, int Longest2>
 bool operator >=(
     const esdl::variable_individual<ElementType, Shortest1, Longest1>& a,
-    const esdl::variable_individual<ElementType, Shortest2, Longest2>& b) restrict(cpu, direct3d) {
+    const esdl::variable_individual<ElementType, Shortest2, Longest2>& b) restrict(cpu, amp) {
     return !(a.fitness < b.fitness);
 }
 template<typename ElementType, int Shortest1, int Shortest2, int Longest1, int Longest2>
 bool operator >(
     const esdl::variable_individual<ElementType, Shortest1, Longest1>& a,
-    const esdl::variable_individual<ElementType, Shortest2, Longest2>& b) restrict(cpu, direct3d) {
+    const esdl::variable_individual<ElementType, Shortest2, Longest2>& b) restrict(cpu, amp) {
     return !(a.fitness < b.fitness || a.fitness == b.fitness);
 }
 
@@ -218,14 +218,14 @@ namespace esdl_sort
         KeyType k;
         int i;
 
-        FitnessIndex() restrict(cpu, direct3d) { }
-        FitnessIndex(const IndividualType& key, int index) restrict(cpu, direct3d) : k(key.fitness), i(index) { }
+        FitnessIndex() restrict(cpu, amp) { }
+        FitnessIndex(const IndividualType& key, int index) restrict(cpu, amp) : k(key.fitness), i(index) { }
 
-        bool operator<(const FitnessIndex<IndividualType>& other) const restrict(cpu, direct3d) {
+        bool operator<(const FitnessIndex<IndividualType>& other) const restrict(cpu, amp) {
             return k > other.k || (k == other.k && i < other.i);
         }
 
-        operator KeyType() const restrict(cpu, direct3d) {
+        operator KeyType() const restrict(cpu, amp) {
             return k;
         }
     };
