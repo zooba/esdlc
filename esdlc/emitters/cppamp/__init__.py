@@ -705,8 +705,18 @@ def emit(model, out=sys.stdout, optimise_level=0, profile=False):
             return
 
         if profile:
+            ext_dir = os.path.expandvars(r'%VSINSTALLDIR%Common7\IDE\Extensions')
+            cvsdk_dir = '.'
+            for dir_name in os.listdir(ext_dir):
+                try: 
+                    cvsdk_dir = os.path.join(ext_dir, dir_name, r'SDK\Native\inc')
+                    os.stat(cvsdk_dir + r'\cvmarkers.h')
+                except OSError:
+                    cvsdk_dir = '.'
+                    continue
+                break
             cmd = ['cl', '/Ox', '/GF', '/GR-', '/GL', '/EHsc', '/MP', 
-                   '/I' + os.path.expandvars(r'%VSINSTALLDIR%Common7\IDE\Extensions\Microsoft\Concurrency Visualizer\SDK\Native\Inc'),
+                   '/I' + cvsdk_dir,
                    '/I' + os.path.join(here, 'lib'),
                    path,
                    os.path.join(here, 'lib', 'rng.cpp'),

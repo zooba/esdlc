@@ -13,6 +13,7 @@
 #include <vector>
 
 #include <amp.h>
+#include <amp_math.h>
 #include <cvmarkers.h>
 
 using concurrency::array_view;

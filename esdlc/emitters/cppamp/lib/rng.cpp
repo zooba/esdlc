@@ -68,7 +68,7 @@ namespace
 
     template<typename State>
     float2 next_normal(State state) restrict(cpu, amp) {
-		const float PI = 3.1415926535897932384626433832795f;
+        const float PI = 3.1415926535897932384626433832795f;
         float u0 = next_float(state), u1 = next_float(state);
         float r = sqrt(-2 * log(u0));  
         float theta = 2 * PI * u1;
