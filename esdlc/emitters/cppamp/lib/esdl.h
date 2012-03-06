@@ -22,7 +22,7 @@ using concurrency::index;
 using concurrency::parallel_for_each;
 
 #include "utility.h"
-#include "sort.h"
+#include "bitonic_sort.h"
 #include "rng.h"
 #include "statistics.h"
 #include "command_line.h"

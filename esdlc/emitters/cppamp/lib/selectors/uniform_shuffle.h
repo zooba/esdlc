@@ -2,7 +2,7 @@
 
 #include <algorithm>
 #include <list>
-#include "sort.h"
+#include "bitonic_sort.h"
 #include "individuals\individuals.h"
 
 
@@ -11,7 +11,6 @@ class uniform_shuffle_t
 {
     SourceType source;
     typedef typename esdl::tt::individual_type<SourceType>::type IndividualType;
-    struct _float { float f; operator float() restrict(cpu, amp) { return f; } };
 
 public:
 
@@ -27,7 +26,7 @@ public:
         auto& src = *pSource;
         auto& dest = *pResult;
         auto _rand = random_array(count);
-        auto _keys = esdl_sort::parallel_sort_keys(*reinterpret_cast<concurrency::array<_float, 1>*>(_rand.get()));
+        auto _keys = bitonic_sort::parallel_sort_keys(*_rand);
         auto& keys = *_keys;
 
         parallel_for_each(src.accelerator_view, dest.extent, [&](index<1> i) restrict(amp) {

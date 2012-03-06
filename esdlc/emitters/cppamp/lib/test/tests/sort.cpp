@@ -8,7 +8,7 @@
 #include "individuals\real_fixed_generators.h"
 #include "individuals\int_fixed_generators.h"
 
-#include "sort.h"
+#include "bitonic_sort.h"
 
 void test_sort_numbers() {
     auto _arr = random_array(512 * 512);
@@ -26,7 +26,7 @@ void test_sort_numbers() {
     _assert(!allAsc && !allDesc);
 
     test_start(L"Sort numbers");
-    auto arr2 = esdl_sort::parallel_sort(arr, true);
+    auto arr2 = bitonic_sort::parallel_sort(arr, true);
     vec.clear();
 
     concurrency::copy(*arr2, std::back_inserter(vec));
@@ -51,7 +51,7 @@ void test_sort_individuals() {
     g1.evaluate();
     typedef esdl::tt::individual_type<decltype(g1)>::type Indiv;
     
-    auto g2 = esdl::group<Indiv>(esdl_sort::parallel_sort(*g1));
+    auto g2 = esdl::group<Indiv>(bitonic_sort::parallel_sort(*g1));
     auto g1l = g1.as_vector();
     auto g2l = g2.as_vector();
 

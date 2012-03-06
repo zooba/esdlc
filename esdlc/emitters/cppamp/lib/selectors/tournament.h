@@ -1,8 +1,9 @@
 #pragma once
 
+#include <amp.h>
 #include <algorithm>
 #include <list>
-#include "sort.h"
+#include "bitonic_sort.h"
 #include "individuals\individuals.h"
 #include "operators\merge.h"
 
@@ -13,8 +14,8 @@ class tournament_t
 
     typename esdl::tt::group_type<SourceType>::type pSource;
 
-    typedef typename esdl_sort::key_index_type<typename esdl::tt::individual_type<SourceType>::type>::type KeyType;
-    std::shared_ptr<concurrency::array<typename esdl_sort::key_index_type<IndividualType>::type,1>> indices;
+    typedef typename bitonic_sort::key_index_type<typename esdl::tt::individual_type<SourceType>::type>::type KeyType;
+    std::shared_ptr<concurrency::array<typename bitonic_sort::key_index_type<IndividualType>::type,1>> indices;
 
     int k;
     float greediness;

@@ -10,10 +10,9 @@ class rank_sus_t
     int mu;
 
     typedef typename esdl::tt::individual_type<SourceType>::type IndividualType;
+    typedef typename bitonic_sort::key_index_type<IndividualType>::type KeyType;
 
     typename esdl::tt::group_type<SourceType>::type pSource;
-
-    typedef typename esdl_sort::key_index_type<typename esdl::tt::individual_type<SourceType>::type>::type KeyType;
     std::vector<KeyType> src_list;
 
     float p, p_next, p_step;
@@ -22,7 +21,7 @@ public:
 
     rank_sus_t(SourceType source, float expectation, int mu) : mu(mu), pSource(source()) {
         pSource.evaluate();
-        auto pKeys = esdl_sort::parallel_sort_keys(*pSource);
+        auto pKeys = bitonic_sort::parallel_sort_keys(*pSource);
         auto& keys = *pKeys;
         
         const int _length = keys.extent.size();

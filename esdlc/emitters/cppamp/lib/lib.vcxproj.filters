@@ -93,9 +93,6 @@
     <ClInclude Include="selectors\best.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="sort.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="individuals\groups.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -130,6 +127,24 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="selectors\tournament.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="operators\clamp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="operators\from_tuple.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="operators\mutate_inversion.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="selectors\rank_proportional.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="selectors\rank_sus.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bitonic_sort.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

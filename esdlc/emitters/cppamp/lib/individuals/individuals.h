@@ -1,10 +1,10 @@
 #pragma once
 
-#include "sort.h"
 #include <memory>
 #include <list>
 #include <vector>
 
+#include "bitonic_sort.h"
 #include "groups.h"
 
 namespace esdl
@@ -205,10 +205,7 @@ namespace esdl
             struct group_type<esdl::group<IndividualType>>
             { typedef esdl::group<IndividualType> type; };
     }
-}
 
-namespace esdl_sort
-{
     template<typename IndividualType>
     struct FitnessIndex
     {
@@ -231,9 +228,9 @@ namespace esdl_sort
     };
 
     template<typename ElementType, int Length>
-        struct key_index_type<esdl::fixed_individual<ElementType, Length>>
-        { typedef FitnessIndex<esdl::fixed_individual<ElementType, Length>> type; };
+        struct bitonic_sort::key_index_type<fixed_individual<ElementType, Length>>
+        { typedef esdl::FitnessIndex<esdl::fixed_individual<ElementType, Length>> type; };
     template<typename ElementType, int Shortest, int Longest>
-        struct key_index_type<esdl::variable_individual<ElementType, Shortest, Longest>>
-        { typedef FitnessIndex<esdl::variable_individual<ElementType, Shortest, Longest>> type; };
+        struct bitonic_sort::key_index_type<variable_individual<ElementType, Shortest, Longest>>
+        { typedef esdl::FitnessIndex<esdl::variable_individual<ElementType, Shortest, Longest>> type; };
 }

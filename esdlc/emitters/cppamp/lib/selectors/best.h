@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <list>
+#include "bitonic_sort.h"
 #include "individuals\individuals.h"
 #include "operators\merge.h"
 
@@ -11,7 +12,7 @@ esdl::Merger_t<typename esdl::tt::group_type<SourceType>::type, 1> best(SourceTy
 
     auto pSource = source();
     pSource.evaluate();
-    auto pResult = esdl::group<IndividualType>(esdl_sort::parallel_sort(*pSource, false));
+    auto pResult = esdl::group<IndividualType>(bitonic_sort::parallel_sort(*pSource, false));
     pResult.evaluate_using(pSource);
     pResult.evaluated = true;
     return esdl::merge(pResult);
@@ -23,7 +24,7 @@ esdl::Merger_t<typename esdl::tt::group_type<SourceType>::type, 1> worst(SourceT
 
     auto pSource = source();
     pSource.evaluate();
-    auto pResult = esdl::group<IndividualType>(esdl_sort::parallel_sort(*pSource, true));
+    auto pResult = esdl::group<IndividualType>(bitonic_sort::parallel_sort(*pSource, true));
     pResult.evaluate_using(pSource);
     pResult.evaluated = true;
     return esdl::merge(pResult);

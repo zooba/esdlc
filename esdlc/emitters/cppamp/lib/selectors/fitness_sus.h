@@ -10,10 +10,9 @@ class fitness_sus_t
     int mu;
 
     typedef typename esdl::tt::individual_type<SourceType>::type IndividualType;
+    typedef typename bitonic_sort::key_index_type<IndividualType>::type KeyType;
 
     typename esdl::tt::group_type<SourceType>::type pSource;
-
-    typedef typename esdl_sort::key_index_type<typename esdl::tt::individual_type<SourceType>::type>::type KeyType;
     std::vector<KeyType> src_list;
 
     float p, p_next, p_step;
@@ -22,7 +21,7 @@ public:
 
     fitness_sus_t(SourceType source, int mu) : mu(mu), pSource(source()) {
         pSource.evaluate();
-        auto keys = esdl_sort::parallel_sort_keys(*pSource);
+        auto keys = bitonic_sort::parallel_sort_keys(*pSource);
         src_list.reserve(keys->extent.size());
         concurrency::copy(*keys, std::back_inserter(src_list));
         
@@ -42,7 +41,7 @@ public:
     fitness_sus_t(SourceType source, const concurrency::array<IndividualType, 1>& offset, int mu)
         : mu(mu), pSource(source()) {
         pSource.evaluate();
-        auto keys = esdl_sort::parallel_sort_keys(*pSource);
+        auto keys = bitonic_sort::parallel_sort_keys(*pSource);
         src_list.reserve(keys->extent.size());
         concurrency::copy(*keys, std::back_inserter(src_list));
         

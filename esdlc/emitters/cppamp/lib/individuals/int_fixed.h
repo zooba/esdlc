@@ -38,12 +38,9 @@ namespace esdl
     }
 }
 
-namespace esdl_sort
-{
-    template<int Length>
-        struct key_index_type<int_fixed_individual<Length>>
-        { typedef FitnessIndex<int_fixed_individual<Length>> type; };
-}
+template<int Length>
+    struct bitonic_sort::key_index_type<int_fixed_individual<Length>>
+    { typedef esdl::FitnessIndex<int_fixed_individual<Length>> type; };
 
 template<int Length>
 struct _output<int_fixed_individual<Length>> {

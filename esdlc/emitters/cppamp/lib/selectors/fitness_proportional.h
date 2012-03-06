@@ -2,7 +2,7 @@
 
 #include <algorithm>
 #include <list>
-#include "sort.h"
+#include "bitonic_sort.h"
 #include "individuals\individuals.h"
 #include "operators\merge.h"
 
@@ -13,8 +13,8 @@ class fitness_proportional_t
 
     typename esdl::tt::group_type<SourceType>::type pSource;
 
-    typedef typename esdl_sort::key_index_type<typename esdl::tt::individual_type<SourceType>::type>::type KeyType;
-    std::shared_ptr<concurrency::array<typename esdl_sort::key_index_type<IndividualType>::type,1>> indices;
+    typedef typename bitonic_sort::key_index_type<IndividualType>::type KeyType;
+    std::shared_ptr<concurrency::array<KeyType, 1>> indices;
 
     float total_fitness;
     bool need_total_fitness;
@@ -24,11 +24,11 @@ class fitness_proportional_t
             return;
         }
 
-        std::vector<typename esdl_sort::key_index_type<IndividualType>::type> key_list;
+        std::vector<KeyType> key_list;
         concurrency::copy(*indices, std::back_inserter(key_list));
         float _total_fitness = 0;
         std::for_each(std::begin(key_list), std::end(key_list),
-            [&](const typename esdl_sort::key_index_type<IndividualType>::type& i) {
+            [&](const KeyType& i) {
             _total_fitness += i.k;
         });
         total_fitness = _total_fitness;
@@ -39,7 +39,7 @@ public:
 
     fitness_proportional_t(SourceType source) : pSource(source()) {
         pSource.evaluate();
-        indices = esdl_sort::parallel_sort_keys(*pSource);
+        indices = bitonic_sort::parallel_sort_keys(*pSource);
         auto& keys = *indices;
 
         concurrency::array<float, 1> offset(keys.extent, keys.accelerator_view);
@@ -55,7 +55,7 @@ public:
 
     fitness_proportional_t(SourceType source, const concurrency::array<IndividualType, 1>& offset) : pSource(source()) {
         pSource.evaluate();
-        indices = esdl_sort::parallel_sort_keys(*pSource);
+        indices = bitonic_sort::parallel_sort_keys(*pSource);
         auto& keys = *indices;
         
         parallel_for_each(keys.accelerator_view, keys.extent, [&](index<1> i) restrict(amp) {
@@ -79,7 +79,7 @@ public:
             keys[i].k *= rand[i];
         });
 
-        auto new_indices = esdl_sort::parallel_sort(keys);
+        auto new_indices = bitonic_sort::parallel_sort(keys);
         auto& new_keys = *new_indices;
 
         parallel_for_each(result.accelerator_view, result.extent, [&](index<1> i) restrict(amp) {

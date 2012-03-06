@@ -2,7 +2,7 @@
 
 #include <algorithm>
 #include <list>
-#include "sort.h"
+#include "bitonic_sort.h"
 #include "individuals\individuals.h"
 #include "operators\merge.h"
 
@@ -10,18 +10,17 @@ template<typename SourceType>
 class rank_proportional_t
 {
     typedef typename esdl::tt::individual_type<SourceType>::type IndividualType;
+    typedef typename bitonic_sort::key_index_type<IndividualType>::type KeyType;
 
     typename esdl::tt::group_type<SourceType>::type pSource;
-
-    typedef typename esdl_sort::key_index_type<typename esdl::tt::individual_type<SourceType>::type>::type KeyType;
-    std::shared_ptr<concurrency::array<typename esdl_sort::key_index_type<IndividualType>::type,1>> indices;
+    std::shared_ptr<concurrency::array<KeyType, 1>> indices;
 
     float total;
 
 public:
     rank_proportional_t(SourceType source, float expectation, bool invert) : pSource(source()) {
         pSource.evaluate();
-        indices = esdl_sort::parallel_sort_keys(*pSource);
+        indices = bitonic_sort::parallel_sort_keys(*pSource);
         auto& keys = *indices;
 
         const int _length = keys.extent.size();
@@ -52,7 +51,7 @@ public:
             keys[i].k *= rand[i];
         });
 
-        auto new_indices = esdl_sort::parallel_sort(keys);
+        auto new_indices = bitonic_sort::parallel_sort(keys);
         auto& new_keys = *new_indices;
 
         parallel_for_each(result.accelerator_view, result.extent, [&](index<1> i) restrict(amp) {
