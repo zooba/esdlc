@@ -51,7 +51,7 @@ namespace esdl
     {
         std::vector<IndividualType> group;
         group.reserve(source.size());
-        concurrency::copy(*esdl_sort::parallel_sort(*source), std::back_inserter(group));
+        concurrency::copy(*bitonic_sort::parallel_sort(*source), std::back_inserter(group));
         Statistics stats;
         stats.max_fitness = (float)group.front().fitness;
         stats.min_fitness = (float)group.back().fitness;
